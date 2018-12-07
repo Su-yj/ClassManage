@@ -18,7 +18,7 @@ def random_username():
 class StudentInfo(models.Model):
     name = models.CharField(verbose_name='学生姓名', max_length=20)
     gender = models.BooleanField(verbose_name='性别', default=False)
-    age = models.IntegerField(verbose_name='年龄', null=False, blank=True)
+    age = models.IntegerField(verbose_name='年龄', null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -38,7 +38,7 @@ class TeacherInfo(models.Model):
     name = models.CharField(verbose_name='老师姓名', max_length=50)
     gender = models.BooleanField(verbose_name='性别', default=False)
     user = models.CharField(verbose_name='账号', max_length=50, default=random_username)
-    password = models.CharField(verbose_name='密码', max_length=40, default=encrypt_password('666666'))
+    password = models.CharField(verbose_name='密码', max_length=40, default='fd3d69aafa0d649b44d7d6cdf4c6159937cadac5')
 
     def __str__(self):
         return self.name
@@ -128,7 +128,7 @@ class TeacherOfLesson(models.Model):
 class ScheduleLessonInfo(models.Model):
     lesson = models.ForeignKey(verbose_name='课程', to=TeacherOfLesson, on_delete=models.CASCADE)
     schedule = models.DateTimeField(verbose_name='上课时间')
-    hour = models.DecimalField(verbose_name='课时', default=2)
+    hour = models.DecimalField(verbose_name='课时', max_digits=18, decimal_places=2, default=2)
 
     class Meta:
         verbose_name = '排课表'
