@@ -1,0 +1,50 @@
+/*表格样式重写*/
+.table-responsive .table thead td{
+	font-weight: bold;
+}
+
+.table th, .table td { 
+	text-align: center;
+	vertical-align: middle!important;
+}
+
+.table-responsive .table .text-muted{
+	padding: 2px;
+	color: #000;
+}
+
+/*课程信息框*/
+.lesson{
+	margin-bottom: 8px;
+	/*text-align: center;*/
+	background-color: #d9edf7;
+	border-radius: 5%;
+	padding: 3px 0;
+}
+
+/*上课时间*/
+.lesson_time{
+	color: #d37c00;
+	font-weight: bold;
+}
+
+/*课程信息*/
+.lesson_info{
+	font-weight: bold;
+	color: #323232;
+}
+
+/*删除按钮*/
+.btn-danger{
+	margin-bottom: 3px;
+}
+
+/*添加学生、老师、课程按钮*/
+.btn-primary{
+	margin: -20px auto 20px;
+}
+
+.form-horizontal .form-group{
+	margin-left: 0;
+	margin-right: 0;
+}
