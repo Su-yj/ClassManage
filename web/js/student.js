@@ -43,13 +43,36 @@ $(function () {
 		check_name();
 		check_age();
 
-		var name = $('#name').val();
-		var gender = $('#gender').val();
-		var grade = $('#grade').val();
-		var age = $('#age').val();
-
-		$.post('url', {'name': name, 'gender': gender, 'grade': grade, 'age': age}, function(result) {
-			alert(result);
-		})
+		if (error_name==false && error_age==false) {
+			var name = $('#name').val();
+			var gender = $('#gender').val();
+			var grade = $('#grade').val();
+			var age = $('#age').val();
+	
+			$.ajax({
+				type: 'POST',
+				url: 'https://www.baidu.com',
+				contentType: "application/json; charset=utf-8",
+				data: JSON.stringify(GetJsonData({'name': name, 'gender': gender, 'grade': grade, 'age': age})),
+				success: function(success){
+					alert('haha')
+				
+				},
+				error: function(error){
+					alert('error')
+				}
+			  });
+			// $.post('http://www.baidu.com', {'name': name, 'gender': gender, 'grade': grade, 'age': age}, function(data) {
+			// 	alert('result')
+			// 	$('.modal').hide()
+			// 	$('.modal-backdrop').hide()
+			// }).error(function(){
+			// 	alert('error')
+			// })
+		}
+		// else{
+		// 	$('.modal').show();
+		// 	alert('false');
+		// }
 	})
 })
