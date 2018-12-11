@@ -28,7 +28,7 @@ $(function () {
 		}
 		else{
 			var age = Number($('#age').val())
-			if (age<0||age>800) {
+			if (age<0||age>80) {
 				$('#age').parent().parent().next().html('请输入正确的年龄').show()
 				error_age = true
 			}
@@ -51,15 +51,27 @@ $(function () {
 	
 			$.ajax({
 				type: 'POST',
-				url: 'https://www.baidu.com',
-				contentType: "application/json; charset=utf-8",
-				data: JSON.stringify(GetJsonData({'name': name, 'gender': gender, 'grade': grade, 'age': age})),
-				success: function(success){
+				url: 'http://127.0.0.1:8888',
+				// contentType: "application/json; charset=utf-8",
+				// data: JSON.stringify({
+				// 	'name': name, 
+				// 	'gender': gender, 
+				// 	'grade': grade, 
+				// 	'age': age
+				// }),
+				data: {
+					'name': name, 
+					'gender': gender, 
+					'grade': grade, 
+					'age': age
+				},
+				success: function(data){
 					alert('haha')
 				
 				},
-				error: function(error){
-					alert('error')
+				error: function(data){
+					console.log(data)
+					alert(data)
 				}
 			  });
 			// $.post('http://www.baidu.com', {'name': name, 'gender': gender, 'grade': grade, 'age': age}, function(data) {

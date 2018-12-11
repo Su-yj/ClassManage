@@ -34,37 +34,33 @@
 	color: #323232;
 }
 
-/*删除按钮*/
-.btn-danger{
-	margin-bottom: 3px;
-}
-
-/*添加学生、老师、课程按钮*/
-.btn-primary{
-	margin: -20px auto 20px;
-}
-
-.form-horizontal .form-group{
-	margin-left: 0;
-	margin-right: 0;
-}
-
-.modal-content{
+.mark_location{
 	position: relative;
 }
 
-.form-group{
-	margin-bottom: 30px;
+/*必填项的**/
+@media (min-width: 768px)
+{
+	.start{
+		color: red;
+		font-weight: bold;
+		position: absolute;
+		left: 140px;
+		top: 10px;
+	}
 }
 
-/*必填项*/
-.start{
-	color: red;
-	font-weight: bold;
-	position: absolute;
-	left: 65px;
-	top: 30px;
+@media (max-width: 767px)
+{
+	.start{
+		color: red;
+		font-weight: bold;
+		position: absolute;
+		left: 75px;
+		top: 3px;
+	}
 }
+
 
 /*提示信息*/
 .error_tip{
