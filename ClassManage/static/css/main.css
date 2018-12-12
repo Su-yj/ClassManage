@@ -1,0 +1,71 @@
+/*表格样式重写*/
+.table-responsive .table thead td{
+	font-weight: bold;
+}
+
+.table th, .table td { 
+	text-align: center;
+	vertical-align: middle!important;
+}
+
+.table-responsive .table .text-muted{
+	padding: 2px;
+	color: #000;
+}
+
+/*课程信息框*/
+.lesson{
+	margin-bottom: 8px;
+	/*text-align: center;*/
+	background-color: #d9edf7;
+	border-radius: 5%;
+	padding: 3px 0;
+}
+
+/*上课时间*/
+.lesson_time{
+	color: #d37c00;
+	font-weight: bold;
+}
+
+/*课程信息*/
+.lesson_info{
+	font-weight: bold;
+	color: #323232;
+}
+
+.mark_location{
+	position: relative;
+}
+
+/*必填项的**/
+@media (min-width: 768px)
+{
+	.start{
+		color: red;
+		font-weight: bold;
+		position: absolute;
+		left: 140px;
+		top: 10px;
+	}
+}
+
+@media (max-width: 767px)
+{
+	.start{
+		color: red;
+		font-weight: bold;
+		position: absolute;
+		left: 75px;
+		top: 3px;
+	}
+}
+
+
+/*提示信息*/
+.error_tip{
+	margin-top: -28px;
+	font-size: 12px;
+	color: red;
+	display: none;
+}
