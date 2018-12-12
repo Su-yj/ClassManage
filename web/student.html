@@ -47,17 +47,17 @@
                             if(data){
                                 //解析json数据
                                 var data = data;
-                                var user = eval("("+data + ")");
+                                var user = eval("("+ data + ")");
     
                                 //赋值
                                 $('#student_id').val(user.student_id);
-                                $('#username').val(user.username);
-                                $('#password').val(user.password);
-                                $('#phone').val(user.phone);
-                                $('#email').val(user.email);
+                                $('#student_name').val(user.student_name);
+                                $('#gender').val(user.gender);
+                                $('#grade').val(user.grade);
+                                $('#age').val(user.age);
     
-                                //在修改用户信息时，username不可修改
-                                $('#username').attr("readonly","readonly");
+                                //在修改用户信息时，student_name不可修改
+                                $('#student_name').attr("readonly","readonly");
                             }
                         }
             });
@@ -74,31 +74,31 @@
                 onkeyup:false,
     
                 rules:{
-                    student_name:{
-                        required:true,
-                        rangelength:[1,8]
-                    },
+                    // student_name:{
+                    //     required:true,
+                    //     rangelength:[1,8]
+                    // },
                     gender:{
                         required:true,
                         // email:true
                     },
                     age:{
-                        // required:false,
+                        required:false,
                         digits:true,
                         range:[3,50]
                     }
                 },
                 messages:{
-                    student_name:{
-                        required:"请填写学生名",
-                        rangelength:"学生名字长度不符合规范"
-                    },
+                    // student_name:{
+                    //     required:"请填写学生名",
+                    //     rangelength:"学生名字长度不符合规范"
+                    // },
                     gender:{
                         required:"请选择性别",
                         // email:"请填写正确的邮箱"
                     },
                     age:{
-                        required:"请填写手机号",
+                        // required:"请填写手机号",
                         digits:"请填写正确的年龄",
                         range:"年龄必须介于3-50之间"
                     }
@@ -108,32 +108,32 @@
                 }
             });
     
-            //自定义动态username验证
-            //username的校验只在添加操作时才需要
-            //通过对username的readonly属性验证来判断是添加还是更新
-            if($('#username').attr("readonly")==undefined){
-                $('#username').rules("add",{
+            //自定义动态student_name验证
+            //student_name的校验只在添加操作时才需要
+            //通过对student_name的readonly属性验证来判断是添加还是更新
+            if($('#student_name').attr("readonly")==undefined){
+                $('#student_name').rules("add",{
                     required:true,
-                    rangelength:[5,20],
-                    remote: {
-                        type: "POST",
-                        url: "/checkUsername",
-                        data: {
-                            username: function () {
-                                return $("#username").val();
-                            }
-                        },
-                        dataType: "html",
-                        dataFilter: function(data) {
-                            if (data == "true")
-                                return true;
-                            else
-                                return false;
-                        }
-                    },
+                    rangelength:[1,8],
+                    // remote: {
+                    //     type: "POST",
+                    //     url: "/checkstudent_name",
+                    //     data: {
+                    //         student_name: function () {
+                    //             return $("#student_name").val();
+                    //         }
+                    //     },
+                    //     dataType: "html",
+                    //     dataFilter: function(data) {
+                    //         if (data == "true")
+                    //             return true;
+                    //         else
+                    //             return false;
+                    //     }
+                    // },
                     messages:{
                         required:"请填写用户名",
-                        remote:"用户名已存在",
+                        // remote:"用户名已存在",
                         rangelength:"用户名长度不符合规范"
                     }
                 });
@@ -144,13 +144,13 @@
         /*
         点击添加用户时需要做的操作：
             1.修改提交表单的URL
-            2.将username的readonly属性移除
+            2.将student_name的readonly属性移除
             3.清空表单数据
             */
         function setUrl() {
             myUrl='/addUser';
-            $('#username').removeAttr("readonly");
-            $('#form-data input').val(" ");
+            $('#student_name').removeAttr("readonly");
+            $('#form-data input').val("");
         }
     
     
@@ -161,7 +161,7 @@
             //将表单内容序列化，即可得到相应对象，直接传到后台
             //student_id为空时，即当前操作为添加用户操作，此时只序列化除id之外四个属性，添加用户时id自增长。如果id为空也被序列化会报错
             if($('#student_id').val()==null||$('#student_id').val()==undefined||$('#student_id').val().length==0){
-                formData = $('#username,#password,#email,#phone').serializeArray();
+                formData = $('#student_name,#gender,#grade,#age').serializeArray();
             }
             //否则为更新操作，student_id为隐藏input，并且已经被赋值，序列化整个表单即可
             else{
@@ -276,6 +276,9 @@
                                             <input type="text" class="form-control" id="student_name" name="student_name" placeholder="请输入学生姓名">
                                         </div>
                                     </div>
+                                    <!-- <div class="row error_tip">
+                                        <div class="col-sm-9 col-sm-offset-3">提示信息</div>
+                                    </div> -->
                                     <div class="form-group mark_location">
                                         <span class="start">*</span>
                                         <label for="gender" class="col-sm-3 control-label">性别</label>
@@ -288,6 +291,9 @@
                                             <!-- <input type="text" class="form-control" id="gender" name="gender" placeholder="密码长度在5-20字符之间"> -->
                                         </div>
                                     </div>
+                                    <!-- <div class="row error_tip">
+                                        <div class="col-sm-9 col-sm-offset-3">提示信息</div>
+                                    </div> -->
                                     <div class="form-group">
                                         <label for="grade" class="col-sm-3 control-label">年级</label>
                                         <div class="col-sm-9">
@@ -316,6 +322,9 @@
                                             <input type="text" class="form-control" id="age" name="age" placeholder="请输入年龄">
                                         </div>
                                     </div>
+                                    <!-- <div class="row error_tip">
+                                        <div class="col-sm-9 col-sm-offset-3">提示信息</div>
+                                    </div> -->
                                 </form>
                             </div>
                             <div class="modal-footer">
