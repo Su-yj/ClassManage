@@ -16,9 +16,12 @@
     <!-- <link rel="stylesheet" href="css/reset.css"> -->
     <link rel="stylesheet" href="css/main.css">
     <!--validate验证表单插件-->
-    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/lib/jquery.js"></script>
+    <script src="js/jquery-1.11.1.js"></script>
+    <script src="js/jquery.validate.min.js"></script>
+    <script src="js/messages_zh.js"></script>
+    <!-- <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/lib/jquery.js"></script>
     <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
-    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/localization/messages_zh.js"></script>
+    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/localization/messages_zh.js"></script> -->
 
     <!-- <script src="js/student.js"></script> -->
     <script>
@@ -27,7 +30,7 @@
         //传入点击的用户id，获取该用户信息并放入表单中
         function update(id) {
             //将提交表单的URL变为update
-            myUrl = '/updateUser';
+            myUrl = '/student/update';
             if(!id){
                 alert('id错误');
                 return false;
@@ -35,7 +38,7 @@
     
             $.ajax(
                     {
-                        url:"/toUpdateUser",
+                        url:"/student/update",
                         data:{"id": id},
                         type:"post",
                         //解决编码问题
@@ -47,6 +50,7 @@
                             if(data){
                                 //解析json数据
                                 var data = data;
+<<<<<<< HEAD
                                 var user = eval("("+ data + ")");
     
                                 //赋值
@@ -55,6 +59,16 @@
                                 $('#gender').val(user.gender);
                                 $('#grade').val(user.grade);
                                 $('#age').val(user.age);
+=======
+                                var student = eval("("+data + ")");
+    
+                                //赋值
+                                $('#student_id').val(student.student_id);
+                                $('#student_name').val(student.student_name);
+                                $('#gender').val(student.gender);
+                                $('#grade').val(student.grade);
+                                $('#age').val(student.age);
+>>>>>>> d3edd4f48747622edf46fbdd62c1d44d5faa2d67
     
                                 //在修改用户信息时，student_name不可修改
                                 $('#student_name').attr("readonly","readonly");
@@ -64,7 +78,7 @@
         }
     
         //表单字段验证
-        //如果按照一般验证的写法，只能调用整个表单的validate函数，而不能调用自定义的username验证，所以把两个函数封装成为一个，在点击按钮时调用
+        //如果按照一般验证的写法，只能调用整个表单的validate函数，而不能调用自定义的student_name验证，所以把两个函数封装成为一个，在点击按钮时调用
         function vali() {
             //form-data表单验证。
             $("#form-data").validate({
@@ -148,7 +162,12 @@
             3.清空表单数据
             */
         function setUrl() {
+<<<<<<< HEAD
             myUrl='/addUser';
+=======
+            // myUrl='/student/add';
+            myUrl='http://127.0.0.1:8000/student/';
+>>>>>>> d3edd4f48747622edf46fbdd62c1d44d5faa2d67
             $('#student_name').removeAttr("readonly");
             $('#form-data input').val("");
         }
@@ -161,7 +180,11 @@
             //将表单内容序列化，即可得到相应对象，直接传到后台
             //student_id为空时，即当前操作为添加用户操作，此时只序列化除id之外四个属性，添加用户时id自增长。如果id为空也被序列化会报错
             if($('#student_id').val()==null||$('#student_id').val()==undefined||$('#student_id').val().length==0){
+<<<<<<< HEAD
                 formData = $('#student_name,#gender,#grade,#age').serializeArray();
+=======
+                formData = $('#student_name,#gender,#age,#grade').serializeArray();
+>>>>>>> d3edd4f48747622edf46fbdd62c1d44d5faa2d67
             }
             //否则为更新操作，student_id为隐藏input，并且已经被赋值，序列化整个表单即可
             else{
@@ -172,7 +195,7 @@
                     url:myUrl,      //根据操作传入不同的URL
                     data:formData,  //传入序列化的表单对象
                     type:"post",
-                    datatype:'text',
+                    dataType:'text',
                     async:false,    //异步传输
                     timeout:50000,
                     //设置编码
