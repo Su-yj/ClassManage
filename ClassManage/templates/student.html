@@ -19,8 +19,10 @@
     <script src="/static/js/jquery-1.11.1.js"></script>
     <script src="/static/js/jquery.validate.min.js"></script>
     <script src="/static/js/messages_zh.js"></script>
+    <!-- <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/lib/jquery.js"></script>
+    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
+    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/localization/messages_zh.js"></script> -->
 
-    <!-- <script src="js/student.js"></script> -->
     <script>
         //定义一个变量用于存储添加和修改时不同的URL
         var myUrl;
@@ -74,13 +76,8 @@
                 onkeyup:false,
     
                 rules:{
-                    // student_name:{
-                    //     required:true,
-                    //     rangelength:[1,8]
-                    // },
                     gender:{
                         required:true,
-                        // email:true
                     },
                     age:{
                         required:false,
@@ -89,24 +86,16 @@
                     }
                 },
                 messages:{
-                    // student_name:{
-                    //     required:"请填写学生名",
-                    //     rangelength:"学生名字长度不符合规范"
-                    // },
                     gender:{
                         required:"请选择性别",
-                        // email:"请填写正确的邮箱"
                     },
                     age:{
-                        // required:"请填写手机号",
                         digits:"请填写正确的年龄",
                         range:"年龄必须介于3-50之间"
                     }
                 },
                 submitHandler:function (form) {
-                    alert('111111');
                     checkForm();
-                    alert('1');
                 }
             });
     
@@ -117,25 +106,8 @@
                 $('#student_name').rules("add",{
                     required:true,
                     rangelength:[1,8],
-                    // remote: {
-                    //     type: "POST",
-                    //     url: "/checkstudent_name",
-                    //     data: {
-                    //         student_name: function () {
-                    //             return $("#student_name").val();
-                    //         }
-                    //     },
-                    //     dataType: "html",
-                    //     dataFilter: function(data) {
-                    //         if (data == "true")
-                    //             return true;
-                    //         else
-                    //             return false;
-                    //     }
-                    // },
                     messages:{
                         required:"请填写用户名",
-                        // remote:"用户名已存在",
                         rangelength:"用户名长度不符合规范"
                     }
                 });
@@ -154,59 +126,10 @@
             myUrl='/student/';
             $('#student_name').removeAttr("readonly");
             $('#form-data input').val("");
+            $('#tip').html('');
         }
     
     
-        //提交表单
-        // function vali(){
-        //     let newformData = new FormData();
-        //     newformData.append('student_name','xiaoming')
-        //     newformData.append('gender','xiaoming')
-        //     console.log(newformData);
-        //     alert('1')
-        //     $.ajax({
-        //             url:myUrl,      //根据操作传入不同的URL
-        //             data:newformData,  //传入序列化的表单对象
-        //             type:"post",
-        //             dataType:'json',
-        //             async:false,    //异步传输
-        //             timeout:50000,
-        //             processData: false,  // 不处理数据
-        //             contentType: false,
-        //             //设置编码
-        //             // contentType: "application/x-www-form-urlencoded; charset=utf-8",
-        //             contentType: "'application/json",
-        //             beforeSend:function () {
-        //                 $('#tip').html('<span style="color: cornflowerblue">正在处理...</span>');
-        //                 return true;
-        //             },
-        //             success:function (data) {
-        //                 console.log(data);
-        //                 if(data){
-        //                     // var JsonObjs = eval("(" + data + ")");
-        //                     // console.log(JsonObjs);
-        //                     // alert('JsonObjs');
-        //                     $('#tip').html('<span style="color: green">操作成功！</span>');
-        //                     location.reload(true);
-        //                 }else{
-        //                     $('#tip').html('<span style="color: red">操作失败，请重试</span>');
-        //                 }
-        //             },
-        //             error:function(XMLHttpRequest, textStatus, errorThrown) {
-        //                 alert(XMLHttpRequest.status);//状态码
-        //                 alert(XMLHttpRequest.readyState);//状态
-        //                 alert(textStatus);//错误信息
-        //                 alert("出错了");
-    
-        //             },
-        //             complete:function () {
-    
-        //             }
-        //     });
-
-        // }
-
-
         function checkForm() {
     
             // var formData;
@@ -222,9 +145,7 @@
             //     console.log(formData);
             // }
             // alert('formdata' + formData)
-            alert('haha')
             var formData = new FormData();
-            alert('yyy')
             if($('#student_id').val()==null||$('#student_id').val()==''||$('#student_id').val().length==0){
                 // formData = $('#student_name,#gender,#age,#grade').serializeArray();
                 formData.append('student_name', $('#student_name').val());
@@ -241,8 +162,6 @@
                 formData.append('grade', $('#grade').val());
                 formData.append('age', $('#age').val());
             }
-            console.log(formData);
-            alert('yy11111y')
 
             $.ajax({
                     url:myUrl,      //根据操作传入不同的URL
@@ -264,19 +183,16 @@
                     success:function (data) {
                         console.log(data);
                         if(data){
-                            // var JsonObjs = eval("(" + data + ")");
-                            // console.log(JsonObjs);
-                            // alert('JsonObjs');
                             $('#tip').html('<span style="color: green">操作成功！</span>');
-                            // location.reload(true);
+                            location.reload(true);
                         }else{
                             $('#tip').html('<span style="color: red">操作失败，请重试</span>');
                         }
                     },
                     error:function(XMLHttpRequest, textStatus, errorThrown) {
-                        alert(XMLHttpRequest.status);//状态码
-                        alert(XMLHttpRequest.readyState);//状态
-                        alert(textStatus);//错误信息
+                        // alert(XMLHttpRequest.status);//状态码
+                        // alert(XMLHttpRequest.readyState);//状态
+                        // alert(textStatus);//错误信息
                         alert("出错了");
     
                     },
@@ -413,68 +329,6 @@
                     </div>
                 </div>
             </form>
-            <!-- <p class="text-right"><button type="button" class="btn btn-primary text-right" data-toggle="modal" data-target=".bs-example-modal-sm">添加学生</button></p> -->
-            <!-- 学生信息框 -->
-            <!-- <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
-                <div class="modal-dialog modal-sm" role="document">
-                    <div class="modal-content">
-                        <div class="label">添加学生</div>
-                        <form class="form-horizontal">
-                            <div class="form-group">
-                                <label for="name" class="col-sm-3 control-label">姓名</label>
-                                <span class="start">*</span>
-                                <div class="col-sm-9">
-                                    <input type="text" class="form-control" id="name" name="name" placeholder="学生姓名">
-                                </div>
-                            </div>
-                            <span class="col-sm-offset-3 col-sm-9 error_tip">提示信息</span>
-                            <div class="form-group">
-                                <label for="gender" class="col-sm-3 control-label">性别</label>
-                                <div class="col-sm-9">
-                                    <select class="form-control" id="gender">
-                                        <option></option>
-                                        <option>男</option>
-                                        <option>女</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="grade" class="col-sm-3 control-label">年级</label>
-                                <div class="col-sm-9">
-                                    <select class="form-control" id="grade" name="grade">
-                                        <option></option>
-                                        <option>一年级</option>
-                                        <option>二年级</option>
-                                        <option>三年级</option>
-                                        <option>四年级</option>
-                                        <option>五年级</option>
-                                        <option>六年级</option>
-                                        <option>初一</option>
-                                        <option>初二</option>
-                                        <option>初三</option>
-                                        <option>高一</option>
-                                        <option>高二</option>
-                                        <option>高三</option>
-                                        <option>其他</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="age" class="col-sm-3 control-label">年龄</label>
-                                <div class="col-sm-9">
-                                    <input type="text" class="form-control" id="age" name="age" placeholder="年龄">
-                                </div>
-                            </div>
-                            <span class="col-sm-offset-3 col-sm-9 error_tip">提示信息</span>
-                            <div class="form-group">
-                                <div class="col-sm-offset-3 col-sm-9">
-                                    <button type="button" class="btn btn-success" id="refer_to">提交</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div> -->
             <!-- 表格 -->
             <table class="table table-bordered table-hover">
                 <thead>
@@ -502,43 +356,6 @@
                     </tr>
                 </tbody>
             </table>
-            <!-- <div class="table-responsive">
-                <table class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <td>姓名</td>
-                            <td>性别</td>
-                            <td>年级</td>
-                            <td>年龄</td>
-                            <td>修改</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th scope="row">张三</th>
-                            <td class="text-muted">男</td>
-                            <td class="text-muted">二年级</td>
-                            <td class="text-muted">8岁</td>
-                            <td class="text-muted"><button type="button" class="btn btn-sm btn-warning">修改</button></td>
-                            
-                        </tr>
-                        <tr>
-                            <th scope="row">张三</th>
-                            <td class="text-muted">男</td>
-                            <td class="text-muted">二年级</td>
-                            <td class="text-muted">8岁</td>
-                            <td class="text-muted"><button type="button" class="btn btn-sm btn-warning">修改</button></td>
-                        </tr>
-                        <tr>
-                            <th scope="row">张三</th>
-                            <td class="text-muted">男</td>
-                            <td class="text-muted">二年级</td>
-                            <td class="text-muted">8岁</td>
-                            <td class="text-muted"><button type="button" class="btn btn-sm btn-warning">修改</button></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>             -->
         </div>
     </div>
 </body>

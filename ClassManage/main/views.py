@@ -20,6 +20,8 @@ class StudentView(View):
         print('--------------------')
         print(request.POST.get('gender'))
         print(student_name)
+        print(request.POST.get('age'))
+        print(request.POST.get('grade'))
         return JsonResponse({'a': 'a'})
         # print('11111')
         # return render(request, 'index.html')
