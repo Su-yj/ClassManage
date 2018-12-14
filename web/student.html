@@ -49,24 +49,24 @@
                             if(data){
                                 //解析json数据
                                 var data = data;
-                                var student = eval("("+data + ")");
+                                var user = eval("("+data + ")");
     
                                 //赋值
-                                $('#student_id').val(student.student_id);
-                                $('#student_name').val(student.student_name);
-                                $('#gender').val(student.gender);
-                                $('#grade').val(student.grade);
-                                $('#age').val(student.age);
+                                $('#user_id').val(user.user_id);
+                                $('#user_name').val(user.user_name);
+                                $('#gender').val(user.gender);
+                                $('#grade').val(user.grade);
+                                $('#age').val(user.age);
     
-                                //在修改用户信息时，student_name不可修改
-                                $('#student_name').attr("readonly","readonly");
+                                //在修改用户信息时，user_name不可修改
+                                $('#user_name').attr("readonly","readonly");
                             }
                         }
             });
         }
     
         //表单字段验证
-        //如果按照一般验证的写法，只能调用整个表单的validate函数，而不能调用自定义的student_name验证，所以把两个函数封装成为一个，在点击按钮时调用
+        //如果按照一般验证的写法，只能调用整个表单的validate函数，而不能调用自定义的user_name验证，所以把两个函数封装成为一个，在点击按钮时调用
         function vali() {
             //form-data表单验证。
             $("#form-data").validate({
@@ -99,11 +99,11 @@
                 }
             });
     
-            //自定义动态student_name验证
-            //student_name的校验只在添加操作时才需要
-            //通过对student_name的readonly属性验证来判断是添加还是更新
-            if($('#student_name').attr("readonly")==undefined){
-                $('#student_name').rules("add",{
+            //自定义动态user_name验证
+            //user_name的校验只在添加操作时才需要
+            //通过对user_name的readonly属性验证来判断是添加还是更新
+            if($('#user_name').attr("readonly")==undefined){
+                $('#user_name').rules("add",{
                     required:true,
                     rangelength:[1,8],
                     messages:{
@@ -118,15 +118,15 @@
         /*
         点击添加用户时需要做的操作：
             1.修改提交表单的URL
-            2.将student_name的readonly属性移除
+            2.将user_name的readonly属性移除
             3.清空表单数据
             */
         function setUrl() {
             // myUrl='/student/add';
             myUrl='http://localhost:8000/student/';
-            $('#student_name').removeAttr("readonly");
+            $('#user_name').removeAttr("readonly");
             $('#form-data input').val("");
-            $('#tip').html('');
+            // $('#tip').html('');
         }
     
     
@@ -134,35 +134,35 @@
     
             // var formData;
             // //将表单内容序列化，即可得到相应对象，直接传到后台
-            // //student_id为空时，即当前操作为添加用户操作，此时只序列化除id之外四个属性，添加用户时id自增长。如果id为空也被序列化会报错
-            // if($('#student_id').val()==null||$('#student_id').val()==undefined||$('#student_id').val().length==0){
-            //     formData = $('#student_name,#gender,#age,#grade').serializeArray();
+            // //user_id为空时，即当前操作为添加用户操作，此时只序列化除id之外四个属性，添加用户时id自增长。如果id为空也被序列化会报错
+            // if($('#user_id').val()==null||$('#user_id').val()==undefined||$('#user_id').val().length==0){
+            //     formData = $('#user_name,#gender,#age,#grade').serializeArray();
             //     console.log(formData);
             // }
-            // //否则为更新操作，student_id为隐藏input，并且已经被赋值，序列化整个表单即可
+            // //否则为更新操作，user_id为隐藏input，并且已经被赋值，序列化整个表单即可
             // else{
             //     formData = $('#form-data').serializeArray();
             //     console.log(formData);
             // }
             // alert('formdata' + formData)
             var formData = new FormData();
-            if($('#student_id').val()==null||$('#student_id').val()==''||$('#student_id').val().length==0){
-                // formData = $('#student_name,#gender,#age,#grade').serializeArray();
-                formData.append('student_name', $('#student_name').val());
+            if($('#user_id').val()==null||$('#user_id').val()==''||$('#user_id').val().length==0){
+                // formData = $('#user_name,#gender,#age,#grade').serializeArray();
+                formData.append('user_name', $('#user_name').val());
                 formData.append('gender', $('#gender').val());
                 formData.append('grade', $('#grade').val());
                 formData.append('age', $('#age').val());
             }
-            //否则为更新操作，student_id为隐藏input，并且已经被赋值，序列化整个表单即可
+            //否则为更新操作，user_id为隐藏input，并且已经被赋值，序列化整个表单即可
             else{
                 // formData = $('#form-data').serializeArray();
-                formData.append('student_id', $('#student_id').val());
-                formData.append('student_name', $('#student_name').val());
+                formData.append('user_id', $('#user_id').val());
+                formData.append('user_name', $('#user_name').val());
                 formData.append('gender', $('#gender').val());
                 formData.append('grade', $('#grade').val());
                 formData.append('age', $('#age').val());
             }
-            console.log(formData);
+            // console.log(formData);
 
             $.ajax({
                     url:myUrl,      //根据操作传入不同的URL
@@ -231,7 +231,7 @@
                             其他 <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="#">学生管理</a></li>
+                            <li class="active"><a href="#">学生管理</a></li>
                             <li><a href="#">老师管理</a></li>
                             <li><a href="#">课程种类</a></li>
                             <!-- <li role="separator" class="divider"></li>
@@ -268,13 +268,13 @@
                             </div>
                             <div class="modal-body">
                                 <form action="" class="form-horizontal">
-                                    <!--student_id为隐藏的input，便于update时的传值-->
-                                    <input type="text" id="student_id" name="student_id" hidden>
+                                    <!--user_id为隐藏的input，便于update时的传值-->
+                                    <input type="text" id="user_id" name="user_id" hidden>
                                     <div class="form-group mark_location">
                                         <span class="start">*</span>
-                                        <label for="student_name" class="col-sm-3 control-label">学生姓名</label>
+                                        <label for="user_name" class="col-sm-3 control-label">姓名</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="student_name" name="student_name" placeholder="请输入学生姓名">
+                                            <input type="text" class="form-control" id="user_name" name="user_name" placeholder="请输入姓名">
                                         </div>
                                     </div>
                                     <div class="form-group mark_location">
@@ -289,7 +289,7 @@
                                             <!-- <input type="text" class="form-control" id="gender" name="gender" placeholder="密码长度在5-20字符之间"> -->
                                         </div>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group mark_location">
                                         <label for="grade" class="col-sm-3 control-label">年级</label>
                                         <div class="col-sm-9">
                                             <!-- <input type="text" class="form-control" id="grade" name="grade" placeholder="请输入手机号"> -->
@@ -311,7 +311,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group mark_location">
                                         <label for="age" class="col-sm-3 control-label">年龄</label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control" id="age" name="age" placeholder="请输入年龄">
@@ -321,7 +321,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                                <!--type为submit时，会自动调用该表单的验证，但是不会调用自己定义的动态的student_name的验证，
+                                <!--type为submit时，会自动调用该表单的验证，但是不会调用自己定义的动态的user_name的验证，
                                 所以把按钮类型改为input，再手动调用封装好的验证函数-->
                                 <button type="input" class="btn btn-primary" onclick="vali();">提交</button>
                                 <span id="tip"></span>
@@ -334,7 +334,7 @@
             <table class="table table-bordered table-hover">
                 <thead>
                     <tr>
-                        <th >id</th>
+                        <th hidden>id</th>
                         <th>姓名</th>
                         <th>性别</th>
                         <th>年级</th>
@@ -344,15 +344,15 @@
                 </thead>
                 <tbody >
                     <tr th:each="user : ${userlist}">
-                        <td th:text="${user.student_id}"></td>
-                        <td th:text="${user.student_name}"></td>
+                        <td hidden th:text="${user.user_id}"></td>
+                        <td th:text="${user.user_name}"></td>
                         <td th:text="${user.gender}"></td>
                         <td th:text="${user.grade}"></td>
                         <td th:text="${user.age}"></td>
                         <td>
                             <!--传入当前用户id-->
-                            <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#updateModal" th:onclick="'javascript: update('+${user.student_id}+')' ">编辑</button>
-                            <button type="button" class="btn btn-danger btn-sm"  th:onclick="'javascript:deleteUser('+${user.student_id}+')' ">删除</button>
+                            <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#updateModal" th:onclick="'javascript: update('+${user.user_id}+')' ">编辑</button>
+                            <button type="button" class="btn btn-danger btn-sm"  th:onclick="'javascript:deleteUser('+${user.user_id}+')' ">删除</button>
                         </td>
                     </tr>
                 </tbody>

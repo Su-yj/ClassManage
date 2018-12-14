@@ -56,16 +56,13 @@
 		color: red;
 		font-weight: bold;
 		position: absolute;
-		left: 75px;
+		left: 48px;
 		top: 3px;
 	}
 }
 
 
-/*提示信息*/
-.error_tip{
-	margin: -18px 0 15px;
-	font-size: 12px;
-	color: red;
-	/* display: none; */
+/* id */
+.table .hide_id{
+	display: none;
 }
