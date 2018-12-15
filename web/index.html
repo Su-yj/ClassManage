@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>index</title>
+    <title>课表</title>
     <!-- <script type="text/javascript" src="js/set_root.js"></script> -->
     <!-- <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script> -->
     <script src="js/jquery.min.js"></script>
@@ -62,6 +62,60 @@
     </nav>
     <div class="jumbotron">
         <div class="container">
+            <p class="text-right"><button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">添加课程</button></p>
+            <!--模态框-->
+            <form method="post" name="user" class="form-horizontal" role="form" id="form-data"  style="margin: 20px;" >
+                <div class="modal fade" id="updateModal"   tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    ×
+                                </button>
+                                <h4 class="modal-title" id="updateModalLabel">
+                                    课程信息
+                                </h4>
+                            </div>
+                            <div class="modal-body">
+                                <form action="" class="form-horizontal">
+                                    <!--user_id为隐藏的input，便于update时的传值-->
+                                    <input type="text" id="user_id" name="user_id" hidden>
+                                    <div class="form-group mark_location">
+                                        <span class="start">*</span>
+                                        <label for="teacher" class="col-sm-3 control-label">老师</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" id="teacher" name="teacher">
+                                                    <option></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mark_location">
+                                        <span class="start">*</span>
+                                        <label for="lesson" class="col-sm-3 control-label">课程</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="lesson" name="lesson" placeholder="请输入姓名">
+                                        </div>
+                                    </div>
+                                    <div class="form-group mark_location" id="hide_account">
+                                        <span class="start">*</span>
+                                        <label for="account" class="col-sm-3 control-label">账号</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="account" name="account" placeholder="请输入账号">
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                <!--type为submit时，会自动调用该表单的验证，但是不会调用自己定义的动态的user_name的验证，
+                                所以把按钮类型改为input，再手动调用封装好的验证函数-->
+                                <button type="input" class="btn btn-primary" onclick="vali();">提交</button>
+                                <span id="tip"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
             <div class="table-responsive">
                 <table class="table table-bordered table-striped">
                     <thead>
@@ -88,7 +142,7 @@
                                     <div class="lesson_time">8月1日 08:00 1.5H</div>
                                     <div class="lesson_info">李老师 李某某(语文)</div>
                                 </div>
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
                                 <div class="lesson">
@@ -99,92 +153,92 @@
                                     <div class="lesson_time">8月1日 08:00 1.5H</div>
                                     <div class="lesson_info">李老师 李某某(语文)</div>
                                 </div>
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
                                 <div class="lesson">
                                     <div class="lesson_time">8月1日 08:00 1.5H</div>
                                     <div class="lesson_info">李老师 李某某(语文)</div>
                                 </div>
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
-                            </td>
-                            <td class="text-muted">
-                                
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
-                            </td>
-                            <td class="text-muted">
-                                <div class="lesson">
-                                    <div class="lesson_time">8月1日 08:00 1.5H</div>
-                                    <div class="lesson_info">李老师 李某某(语文)</div>
-                                </div>
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
-                            </td>
-                            <td class="text-muted">
-                                <div class="lesson">
-                                    <div class="lesson_time">8月1日 08:00 1.5H</div>
-                                    <div class="lesson_info">李老师 李某某(语文)</div>
-                                </div>
-                                <div class="lesson">
-                                    <div class="lesson_time">8月1日 08:00 1.5H</div>
-                                    <div class="lesson_info">李老师 李某某(语文)</div>
-                                </div>
-                                <div class="lesson">
-                                    <div class="lesson_time">8月1日 08:00 1.5H</div>
-                                    <div class="lesson_info">李老师 李某某(语文)</div>
-                                </div>
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
                                 
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
+                            </td>
+                            <td class="text-muted">
+                                <div class="lesson">
+                                    <div class="lesson_time">8月1日 08:00 1.5H</div>
+                                    <div class="lesson_info">李老师 李某某(语文)</div>
+                                </div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
+                            </td>
+                            <td class="text-muted">
+                                <div class="lesson">
+                                    <div class="lesson_time">8月1日 08:00 1.5H</div>
+                                    <div class="lesson_info">李老师 李某某(语文)</div>
+                                </div>
+                                <div class="lesson">
+                                    <div class="lesson_time">8月1日 08:00 1.5H</div>
+                                    <div class="lesson_info">李老师 李某某(语文)</div>
+                                </div>
+                                <div class="lesson">
+                                    <div class="lesson_time">8月1日 08:00 1.5H</div>
+                                    <div class="lesson_info">李老师 李某某(语文)</div>
+                                </div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
+                            </td>
+                            <td class="text-muted">
+                                
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                         </tr>
                         <tr>
                             <th scope="row">下午</th>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                         </tr>
                         <tr>
                             <th scope="row">晚上</th>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                         </tr>
                     </tbody>
@@ -216,7 +270,7 @@
                                     <div class="lesson_time">8月1日 08:00 1.5H</div>
                                     <div class="lesson_info">李老师 李某某(语文)</div>
                                 </div>
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
                                 <div class="lesson">
@@ -227,92 +281,92 @@
                                     <div class="lesson_time">8月1日 08:00 1.5H</div>
                                     <div class="lesson_info">李老师 李某某(语文)</div>
                                 </div>
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
                                 <div class="lesson">
                                     <div class="lesson_time">8月1日 08:00 1.5H</div>
                                     <div class="lesson_info">李老师 李某某(语文)</div>
                                 </div>
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
-                            </td>
-                            <td class="text-muted">
-                                
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
-                            </td>
-                            <td class="text-muted">
-                                <div class="lesson">
-                                    <div class="lesson_time">8月1日 08:00 1.5H</div>
-                                    <div class="lesson_info">李老师 李某某(语文)</div>
-                                </div>
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
-                            </td>
-                            <td class="text-muted">
-                                <div class="lesson">
-                                    <div class="lesson_time">8月1日 08:00 1.5H</div>
-                                    <div class="lesson_info">李老师 李某某(语文)</div>
-                                </div>
-                                <div class="lesson">
-                                    <div class="lesson_time">8月1日 08:00 1.5H</div>
-                                    <div class="lesson_info">李老师 李某某(语文)</div>
-                                </div>
-                                <div class="lesson">
-                                    <div class="lesson_time">8月1日 08:00 1.5H</div>
-                                    <div class="lesson_info">李老师 李某某(语文)</div>
-                                </div>
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
                                 
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
+                            </td>
+                            <td class="text-muted">
+                                <div class="lesson">
+                                    <div class="lesson_time">8月1日 08:00 1.5H</div>
+                                    <div class="lesson_info">李老师 李某某(语文)</div>
+                                </div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
+                            </td>
+                            <td class="text-muted">
+                                <div class="lesson">
+                                    <div class="lesson_time">8月1日 08:00 1.5H</div>
+                                    <div class="lesson_info">李老师 李某某(语文)</div>
+                                </div>
+                                <div class="lesson">
+                                    <div class="lesson_time">8月1日 08:00 1.5H</div>
+                                    <div class="lesson_info">李老师 李某某(语文)</div>
+                                </div>
+                                <div class="lesson">
+                                    <div class="lesson_time">8月1日 08:00 1.5H</div>
+                                    <div class="lesson_info">李老师 李某某(语文)</div>
+                                </div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
+                            </td>
+                            <td class="text-muted">
+                                
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                         </tr>
                         <tr>
                             <th scope="row">下午</th>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                         </tr>
                         <tr>
                             <th scope="row">晚上</th>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                             <td class="text-muted">
-                                <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div>
+                                <!-- <div class="add"><button type="button" class="btn btn-xs btn-success">添加</button></div> -->
                             </td>
                         </tr>
                     </tbody>

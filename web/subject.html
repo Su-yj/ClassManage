@@ -28,8 +28,10 @@
         var myUrl;
         //传入点击的用户id，获取该用户信息并放入表单中
         function update(id) {
+            alert('111');
+            $('#hide_account').show();
             //将提交表单的URL变为update
-            myUrl = '/subject/update';
+            myUrl = '/teacher/update';
             if(!id){
                 alert('id错误');
                 return false;
@@ -37,7 +39,7 @@
     
             $.ajax(
                     {
-                        url:"/subject/update",
+                        url:"/teacher/update",
                         data:{"id": id},
                         type:"post",
                         //解决编码问题
@@ -53,12 +55,11 @@
     
                                 //赋值
                                 $('#user_id').val(user.user_id);
-                                $('#user_name').val(user.user_name);
-                                $('#gender').val(user.gender);
-                                $('#account').val(user.account);
+                                $('#subject').val(user.subject);
+                                $('#type').val(user.type);
     
                                 //在修改用户信息时，user_name不可修改
-                                $('#user_name').attr("readonly","readonly");
+                                $('#subject').attr("readonly","readonly");
                             }
                         }
             });
@@ -75,23 +76,14 @@
                 onkeyup:false,
     
                 rules:{
-                    gender:{
+                    type:{
                         required:true,
                     },
-                    account:{
-                        required:false,
-                        digits:true,
-                        range:[3,50]
-                    }
                 },
                 messages:{
-                    gender:{
-                        required:"请选择性别",
+                    type:{
+                        required:"请选择种类",
                     },
-                    age:{
-                        digits:"请填写正确的年龄",
-                        range:"年龄必须介于3-50之间"
-                    }
                 },
                 submitHandler:function (form) {
                     checkForm();
@@ -101,13 +93,11 @@
             //自定义动态user_name验证
             //user_name的校验只在添加操作时才需要
             //通过对user_name的readonly属性验证来判断是添加还是更新
-            if($('#user_name').attr("readonly")==undefined){
-                $('#user_name').rules("add",{
+            if($('#subject').attr("readonly")==undefined){
+                $('#subject').rules("add",{
                     required:true,
-                    rangelength:[1,8],
                     messages:{
-                        required:"请填写用户名",
-                        rangelength:"用户名长度不符合规范"
+                        required:"请输入科目",
                     }
                 });
             }
@@ -121,10 +111,11 @@
             3.清空表单数据
             */
         function setUrl() {
-            // myUrl='/subject/add';
-            myUrl='http://localhost:8000/subject/';
+            // myUrl='/teacher/add';
+            myUrl='http://localhost:8000/teacher/';
             $('#user_name').removeAttr("readonly");
             $('#form-data input').val("");
+            $('#hide_account').hide();
             // $('#tip').html('');
         }
     
@@ -149,7 +140,7 @@
                 // formData = $('#user_name,#gender,#age,#account').serializeArray();
                 formData.append('user_name', $('#user_name').val());
                 formData.append('gender', $('#gender').val());
-                formData.append('account', $('#account').val());
+                // formData.append('account', $('#account').val());
             }
             //否则为更新操作，user_id为隐藏input，并且已经被赋值，序列化整个表单即可
             else{
@@ -249,7 +240,7 @@
     <div class="jumbotron">
         <div class="container">
             <!-- Large modal -->
-            <p class="text-right"><button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">添加学生</button></p>
+            <p class="text-right"><button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">添加科目</button></p>
             <!--模态框-->
             <form method="post" name="user" class="form-horizontal" role="form" id="form-data"  style="margin: 20px;" >
                 <div class="modal fade" id="updateModal"   tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
@@ -260,7 +251,7 @@
                                     ×
                                 </button>
                                 <h4 class="modal-title" id="updateModalLabel">
-                                    老师信息
+                                    科目信息
                                 </h4>
                             </div>
                             <div class="modal-body">
@@ -269,28 +260,23 @@
                                     <input type="text" id="user_id" name="user_id" hidden>
                                     <div class="form-group mark_location">
                                         <span class="start">*</span>
-                                        <label for="user_name" class="col-sm-3 control-label">姓名</label>
+                                        <label for="subject" class="col-sm-3 control-label">科目</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="user_name" name="user_name" placeholder="请输入姓名">
+                                            <input type="text" class="form-control" id="subject" name="subject" placeholder="请输入科目">
                                         </div>
                                     </div>
                                     <div class="form-group mark_location">
                                         <span class="start">*</span>
-                                        <label for="gender" class="col-sm-3 control-label">性别</label>
+                                        <label for="type" class="col-sm-3 control-label">类型</label>
                                         <div class="col-sm-9">
-                                            <select class="form-control" id="gender" name="gender">
+                                            <select class="form-control" id="type" name="type">
                                                     <option></option>
-                                                    <option>男</option>
-                                                    <option>女</option>
+                                                    <option>晚辅</option>
+                                                    <option>一对一</option>
+                                                    <option>小班课</option>
+                                                    <option>兼职</option>
                                             </select>
                                             <!-- <input type="text" class="form-control" id="gender" name="gender" placeholder="密码长度在5-20字符之间"> -->
-                                        </div>
-                                    </div>
-                                    <div class="form-group mark_location">
-                                        <span class="start">*</span>
-                                        <label for="account" class="col-sm-3 control-label">账号</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="account" name="account" placeholder="请输入账号">
                                         </div>
                                     </div>
                                 </form>
@@ -310,19 +296,17 @@
             <table class="table table-bordered table-hover">
                 <thead>
                     <tr>
-                        <th class="hide_id">id</th>
-                        <th>姓名</th>
-                        <th>性别</th>
-                        <th>账号</th>
+                        <th hidden>id</th>
+                        <th>科目</th>
+                        <th>类型</th>
                         <th>修改</th>
                     </tr>
                 </thead>
                 <tbody >
                     <tr th:each="user : ${userlist}">
-                        <td class="hide_id" th:text="${user.user_id}"></td>
-                        <td th:text="${user.user_name}"></td>
-                        <td th:text="${user.gender}"></td>
-                        <td th:text="${user.account}"></td>
+                        <td hidden th:text="${user.user_id}"></td>
+                        <td th:text="${user.subject}"></td>
+                        <td th:text="${user.type}"></td>
                         <td>
                             <!--传入当前用户id-->
                             <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#updateModal" th:onclick="'javascript: update('+${user.user_id}+')' ">编辑</button>
