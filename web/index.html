@@ -7,15 +7,248 @@
     <title>课表</title>
     <!-- <script type="text/javascript" src="js/set_root.js"></script> -->
     <!-- <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script> -->
+    <!-- jquery -->
     <script src="js/jquery.min.js"></script>
+    <!-- bootstrap js -->
     <script src="js/bootstrap.min.js"></script>
+    <!-- bootstrap css -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/reset.css">
+    <!-- <link rel="stylesheet" href="css/reset.css"> -->
     <link rel="stylesheet" href="css/main.css">
-    <style type="text/css">
-        
+    <!--validate验证表单插件-->
+    <script src="js/jquery-1.11.1.js"></script>
+    <script src="js/jquery.validate.min.js"></script>
+    <script src="js/messages_zh.js"></script>
+    <!-- <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/lib/jquery.js"></script>
+    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
+    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/localization/messages_zh.js"></script> -->
+    <!-- datetimepicker时间插件 -->
+    <script src="js/bootstrap-datetimepicker.min.js"></script>
+    <script src="js/bootstrap-datetimepicker.zh-CN.js"></script>
+    <link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css">
+    <script>
+        //定义一个变量用于存储添加和修改时不同的URL
+        var myUrl;
+        //传入点击的用户id，获取该用户信息并放入表单中
+        function update(id) {
+            //将提交表单的URL变为update
+            myUrl = '/student/update';
+            if(!id){
+                alert('id错误');
+                return false;
+            }
+    
+            $.ajax(
+                    {
+                        url:"/student/update",
+                        data:{"id": id},
+                        type:"post",
+                        //解决编码问题
+                        scriptCharset: 'utf-8',
+                        beforeSend:function () {
+                            return true;
+                        },
+                        success:function (data) {
+                            if(data){
+                                //解析json数据
+                                var data = data;
+                                var user = eval("("+data + ")");
+    
+                                //赋值
+                                $('#user_id').val(user.user_id);
+                                $('#teacher').val(user.teacher);
+                                $('#lesson').val(user.lesson);
+                                $('#start').val(user.start);
+                                $('#end').val(user.end);
+    
+                                //在修改用户信息时，user_name不可修改
+                                $('#user_id').attr("readonly","readonly");
+                            }
+                        }
+            });
+        }
+    
+        //表单字段验证
+        //如果按照一般验证的写法，只能调用整个表单的validate函数，而不能调用自定义的user_name验证，所以把两个函数封装成为一个，在点击按钮时调用
+        function vali() {
+            //form-data表单验证。
+            $("#form-data").validate({
+                onfocusout:function(element) { $(element).valid(); },
+                onblur: function(element) { $(element).valid(); },    //鼠标移开验证。这里写onblue:true没有效果
+                onsubmit:true,      //提交时验证（有效）
+                onkeyup:false,
+    
+                rules:{
+                    teacher:{
+                        required:true,
+                    },
+                    lesson:{
+                        required:true,
+                    },
+                    start:{
+                        required:true,
+                    },
+                    end:{
+                        required:true,
+                    }
+                },
+                messages:{
+                    teacher:{
+                        required:"请选择老师",
+                    },
+                    lesson:{
+                        required:"请选择课程",
+                    },
+                    start:{
+                        required:"请选择开始时间",
+                    },
+                    end:{
+                        required:"请选择结束时间",
+                    }
+                },
+                submitHandler:function (form) {
+                    checkForm();
+                }
+            });
+    
+        }
+    
+    
+        /*
+        点击添加用户时需要做的操作：
+            1.修改提交表单的URL
+            2.将user_name的readonly属性移除
+            3.清空表单数据
+            */
+        function setUrl() {
+            // myUrl='/student/add';
+            myUrl='http://localhost:8000/student/';
+            $('#user_id').removeAttr("readonly");
+            $('#form-data input').val("");
+        }
+    
+    
+        function checkForm() {
+    
+            // var formData;
+            // //将表单内容序列化，即可得到相应对象，直接传到后台
+            // //user_id为空时，即当前操作为添加用户操作，此时只序列化除id之外四个属性，添加用户时id自增长。如果id为空也被序列化会报错
+            // if($('#user_id').val()==null||$('#user_id').val()==undefined||$('#user_id').val().length==0){
+            //     formData = $('#user_name,#gender,#age,#grade').serializeArray();
+            //     console.log(formData);
+            // }
+            // //否则为更新操作，user_id为隐藏input，并且已经被赋值，序列化整个表单即可
+            // else{
+            //     formData = $('#form-data').serializeArray();
+            //     console.log(formData);
+            // }
+            // alert('formdata' + formData)
+            var formData = new FormData();
+            if($('#user_id').val()==null||$('#user_id').val()==''||$('#user_id').val().length==0){
+                // formData = $('#user_name,#gender,#age,#grade').serializeArray();
+                formData.append('teacher', $('#teacher').val());
+                formData.append('lesson', $('#lesson').val());
+                formData.append('start', $('#start').val());
+                formData.append('end', $('#end').val());
+            }
+            //否则为更新操作，user_id为隐藏input，并且已经被赋值，序列化整个表单即可
+            else{
+                // formData = $('#form-data').serializeArray();
+                formData.append('user_id', $('#user_id').val());
+                formData.append('teacher', $('#teacher').val());
+                formData.append('lesson', $('#lesson').val());
+                formData.append('start', $('#start').val());
+                formData.append('end', $('#end').val());
+            }
+            // console.log(formData);
 
-    </style>
+            $.ajax({
+                    url:myUrl,      //根据操作传入不同的URL
+                    data:formData,  //传入序列化的表单对象
+                    type:"post",
+                    dataType:'json',
+                    async:false,    //异步传输
+                    timeout:50000,
+                    //设置编码
+                    // contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                    // contentType: "'application/json",
+                    // headers:{"X-CSRFToken":$.cookie('csrftoken')},
+                    processData: false,  // 不处理数据
+                    contentType: false,
+                    beforeSend:function () {
+                        $('#tip').html('<span style="color: cornflowerblue">正在处理...</span>');
+                        return true;
+                    },
+                    success:function (data) {
+                        console.log(data);
+                        if(data){
+                            $('#tip').html('<span style="color: green">操作成功！</span>');
+                            location.reload(true);
+                        }else{
+                            $('#tip').html('<span style="color: red">操作失败，请重试</span>');
+                        }
+                    },
+                    error:function(XMLHttpRequest, textStatus, errorThrown) {
+                        // alert(XMLHttpRequest.status);//状态码
+                        // alert(XMLHttpRequest.readyState);//状态
+                        // alert(textStatus);//错误信息
+                        alert("出错了");
+    
+                    },
+                    complete:function () {
+    
+                    }
+            });
+        }
+    
+    </script>
+    <script>
+        $(function(){
+            $("#start").datetimepicker({
+                format:'yyyy-mm-dd hh:ii',  //格式  如果只有yyyy-mm-dd那就是0000-00-00
+                autoclose:true,//选择后是否自动关闭 
+                minView:0,//最精准的时间选择为日期  0-分 1-时 2-日 3-月
+                language:  'zh-CN', //中文
+                weekStart: 1, //一周从星期几开始
+                todayBtn:  1,
+                autoclose: 1,
+                todayHighlight: 1,
+                startView: 2,
+                forceParse: 0,
+            // daysOfWeekDisabled:"1,2,3", //一周的周几不能选 格式为"1,2,3"  数组格式也行
+                todayBtn : true,  //在底部是否显示今天
+                todayHighlight :false, //今天是否高亮显示
+                keyboardNavigation:true, //方向图标改变日期  必须要有img文件夹 里面存放图标
+                showMeridian:false,  //是否出现 上下午
+                initialDate:new Date()
+                //startDate: "2017-01-01" //日期开始时间 也可以是new Date()只能选择以后的时间
+            }).on("changeDate",function(){
+                var start = $("#start").val();
+                $("#end").datetimepicker("setStartDate",start);
+            }); 
+            $("#end").datetimepicker({
+                format:'yyyy-mm-dd hh:ii',  //格式  如果只有yyyy-mm-dd那就是0000-00-00
+                autoclose:true,//选择后是否自动关闭 
+                minView:0,//最精准的时间选择为日期  0-分 1-时 2-日 3-月
+                language:  'zh-CN', //中文
+                weekStart: 1, //一周从星期几开始
+                todayBtn:  1,
+                autoclose: 1,
+                todayHighlight: 1,
+                startView: 2,
+                forceParse: 0,
+                //daysOfWeekDisabled:"1,2,3", //一周的周几不能选
+                todayBtn : true,  //在底部是否显示今天
+                todayHighlight :false, //今天是否高亮显示
+                keyboardNavigation:true, //方向图标改变日期  必须要有img文件夹 里面存放图标
+                showMeridian:false  //是否出现 上下午
+            // startDate: "2017-01-01"  //开始时间  ENdDate 结束时间
+            }).on("changeDate",function(){
+                var end = $("#end").val();
+                $("#start").datetimepicker("setEndDate",end);
+            });   
+        });
+    </script>
 </head>
 <body>
     <!-- 导航栏 -->
@@ -81,26 +314,41 @@
                                     <!--user_id为隐藏的input，便于update时的传值-->
                                     <input type="text" id="user_id" name="user_id" hidden>
                                     <div class="form-group mark_location">
-                                        <span class="start">*</span>
+                                        <!-- <span class="start">*</span> -->
                                         <label for="teacher" class="col-sm-3 control-label">老师</label>
                                         <div class="col-sm-9">
                                             <select class="form-control" id="teacher" name="teacher">
                                                     <option></option>
+                                                    <option>1</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="form-group mark_location">
-                                        <span class="start">*</span>
+                                        <!-- <span class="start">*</span> -->
                                         <label for="lesson" class="col-sm-3 control-label">课程</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="lesson" name="lesson" placeholder="请输入姓名">
+                                            <select class="form-control" id="lesson" name="lesson">
+                                                    <option></option>
+                                                    <option>1</option>
+                                            </select>
                                         </div>
                                     </div>
-                                    <div class="form-group mark_location" id="hide_account">
-                                        <span class="start">*</span>
-                                        <label for="account" class="col-sm-3 control-label">账号</label>
+                                    <div class="form-group mark_location">
+                                        <label for="start" class="col-sm-3 control-label">开始时间</label>
+                                        <!-- <span class="col-sm-1 star">*</span> -->
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="account" name="account" placeholder="请输入账号">
+                                            <!-- <input type="text" class="form-control" id="time" name="time" placeholder="请输入姓名"> -->
+                                            <input type="text" class="form-control" placeholder="开始时间" id="start" name="start">
+                                            <!-- <input type="text" class="form-control" placeholder="结束时间" id="end"> -->
+                                        </div>
+                                    </div>
+                                    <div class="form-group mark_location">
+                                        <!-- <span class="start">*</span> -->
+                                        <label for="end" class="col-sm-3 control-label">结束时间</label>
+                                        <div class="col-sm-9">
+                                            <!-- <input type="text" class="form-control" id="time" name="time" placeholder="请输入姓名"> -->
+                                            <!-- <input type="text" class="form-control" placeholder="开始时间" id="start"> -->
+                                            <input type="text" class="form-control" placeholder="结束时间" id="end" name="end">
                                         </div>
                                     </div>
                                 </form>
