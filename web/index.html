@@ -16,6 +16,7 @@
     <!-- <link rel="stylesheet" href="css/reset.css"> -->
     <link rel="stylesheet" href="css/main.css">
     <!--validate验证表单插件-->
+    <link rel="stylesheet" href="css/validation.css">
     <script src="js/jquery-1.11.1.js"></script>
     <script src="js/jquery.validate.min.js"></script>
     <script src="js/messages_zh.js"></script>
@@ -27,10 +28,23 @@
     <script src="js/bootstrap-datetimepicker.zh-CN.js"></script>
     <link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css">
     <script>
+        // 添加validation验证方法
+        $.validator.addMethod("isDatetime",function(value,element){
+            var score =  /^[0-9]{4}-[0-1]?[0-9]{1}-[0-3]?[0-9]{1} (0\d{1}|1\d{1}|2[0-3]):([0-5]\d{1})$/;
+            return this.optional(element) || (score.test(value));
+        },"<font>请输入正确的时间格式 (2018-01-01 08:00)</font>");
+
         //定义一个变量用于存储添加和修改时不同的URL
         var myUrl;
         //传入点击的用户id，获取该用户信息并放入表单中
         function update(id) {
+            
+            $('#start').attr('value', 'haha');
+            $('#teacher').val('haha');
+            // console.log($(this).attr('id'));
+            // console.log($(this).find('.end_time').text());
+
+         
             //将提交表单的URL变为update
             myUrl = '/student/update';
             if(!id){
@@ -38,34 +52,34 @@
                 return false;
             }
     
-            $.ajax(
-                    {
-                        url:"/student/update",
-                        data:{"id": id},
-                        type:"post",
-                        //解决编码问题
-                        scriptCharset: 'utf-8',
-                        beforeSend:function () {
-                            return true;
-                        },
-                        success:function (data) {
-                            if(data){
-                                //解析json数据
-                                var data = data;
-                                var user = eval("("+data + ")");
+            // $.ajax(
+            //         {
+            //             url:"/student/update",
+            //             data:{"id": id},
+            //             type:"post",
+            //             //解决编码问题
+            //             scriptCharset: 'utf-8',
+            //             beforeSend:function () {
+            //                 return true;
+            //             },
+            //             success:function (data) {
+            //                 if(data){
+            //                     //解析json数据
+            //                     var data = data;
+            //                     var user = eval("("+data + ")");
     
-                                //赋值
-                                $('#user_id').val(user.user_id);
-                                $('#teacher').val(user.teacher);
-                                $('#lesson').val(user.lesson);
-                                $('#start').val(user.start);
-                                $('#end').val(user.end);
+            //                     //赋值
+            //                     $('#user_id').val(user.user_id);
+            //                     $('#teacher').val(user.teacher);
+            //                     $('#lesson').val(user.lesson);
+            //                     $('#start').val(user.start);
+            //                     $('#end').val(user.end);
     
-                                //在修改用户信息时，user_name不可修改
-                                $('#user_id').attr("readonly","readonly");
-                            }
-                        }
-            });
+            //                     //在修改用户信息时，user_name不可修改
+            //                     $('#user_id').attr("readonly","readonly");
+            //                 }
+            //             }
+            // });
         }
     
         //表单字段验证
@@ -87,9 +101,11 @@
                     },
                     start:{
                         required:true,
+                        isDatetime:true,
                     },
                     end:{
                         required:true,
+                        isDatetime:true,
                     }
                 },
                 messages:{
@@ -382,11 +398,13 @@
                         <tr>
                             <th scope="row">上午</th>
                             <td class="text-muted">
-                                <div class="lesson">
-                                    <div class="lesson_time">8月1日 08:00 1.5H</div>
+                                <div class="lesson" id="143" data-toggle="modal" data-target="#updateModal" onclick="update(this.id)">
+                                    <div id="111" hidden></div>
                                     <div class="lesson_info">李老师 李某某(语文)</div>
+                                    <div class="start_time">2018-01-01 08:00</div>
+                                    <div class="end_time">2018-01-01 09:00</div>
                                 </div>
-                                <div class="lesson">
+                                <div class="lesson" onclick="update(123)">
                                     <div class="lesson_time">8月1日 08:00 1.5H</div>
                                     <div class="lesson_info">李老师 李某某(语文)</div>
                                 </div>
