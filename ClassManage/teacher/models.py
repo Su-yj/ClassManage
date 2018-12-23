@@ -54,7 +54,7 @@ class TeacherOfLesson(models.Model):
     price = models.DecimalField(verbose_name='老师课时费', max_digits=18, decimal_places=2)
 
     def __str__(self):
-        return '%s[%s]' % (self.teacher, self.lesson)
+        return '%s [%s]' % (self.teacher, self.lesson)
 
     class Meta:
         verbose_name = '老师课程关系表'

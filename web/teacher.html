@@ -261,28 +261,34 @@
                                 <form action="" class="form-horizontal">
                                     <!--user_id为隐藏的input，便于update时的传值-->
                                     <input type="text" id="user_id" name="user_id" hidden>
-                                    <div class="form-group mark_location">
-                                        <span class="start">*</span>
-                                        <label for="user_name" class="col-sm-3 control-label">姓名</label>
+                                    <div class="form-group">
+                                        <label for="user_name" class="col-sm-3 control-label mark_location">
+                                            姓名
+                                            <span class="star">*</span>
+                                        </label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control" id="user_name" name="user_name" placeholder="请输入姓名">
                                         </div>
                                     </div>
-                                    <div class="form-group mark_location">
-                                        <span class="start">*</span>
-                                        <label for="gender" class="col-sm-3 control-label">性别</label>
+                                    <div class="form-group">
+                                        <label for="gender" class="col-sm-3 control-label mark_location">
+                                            性别
+                                            <span class="star">*</span>
+                                        </label>
                                         <div class="col-sm-9">
                                             <select class="form-control" id="gender" name="gender">
-                                                    <option></option>
-                                                    <option>男</option>
-                                                    <option>女</option>
+                                                <option value="">请选择性别</option>
+                                                <option value="1">男</option>
+                                                <option value="0">女</option>
                                             </select>
                                             <!-- <input type="text" class="form-control" id="gender" name="gender" placeholder="密码长度在5-20字符之间"> -->
                                         </div>
                                     </div>
-                                    <div class="form-group mark_location" id="hide_account">
-                                        <span class="start">*</span>
-                                        <label for="account" class="col-sm-3 control-label">账号</label>
+                                    <div class="form-group">
+                                        <label for="account" class="col-sm-3 control-label mark_location">
+                                            账号
+                                            <span class="star">*</span>
+                                        </label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control" id="account" name="account" placeholder="请输入账号">
                                         </div>

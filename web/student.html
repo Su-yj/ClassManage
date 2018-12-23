@@ -19,6 +19,7 @@
     <script src="js/jquery-1.11.1.js"></script>
     <script src="js/jquery.validate.min.js"></script>
     <script src="js/messages_zh.js"></script>
+    <link rel="stylesheet" href="css/validation.css">
     <!-- <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/lib/jquery.js"></script>
     <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
     <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/localization/messages_zh.js"></script> -->
@@ -26,43 +27,40 @@
     <script>
         //定义一个变量用于存储添加和修改时不同的URL
         var myUrl;
-        //传入点击的用户id，获取该用户信息并放入表单中
+
+        // 点击update,并传入id
         function update(id) {
-            //将提交表单的URL变为update
-            myUrl = '/student/update';
+            myUrl = 'student/info/';
             if(!id){
                 alert('id错误');
                 return false;
             }
-    
-            $.ajax(
-                    {
-                        url:"/student/update",
-                        data:{"id": id},
-                        type:"post",
-                        //解决编码问题
-                        scriptCharset: 'utf-8',
-                        beforeSend:function () {
-                            return true;
-                        },
-                        success:function (data) {
-                            if(data){
-                                //解析json数据
-                                var data = data;
-                                var user = eval("("+data + ")");
-    
-                                //赋值
-                                $('#user_id').val(user.user_id);
-                                $('#user_name').val(user.user_name);
-                                $('#gender').val(user.gender);
-                                $('#grade').val(user.grade);
-                                $('#age').val(user.age);
-    
-                                //在修改用户信息时，user_name不可修改
-                                $('#user_name').attr("readonly","readonly");
-                            }
-                        }
-            });
+
+            $.ajax({
+                url: myUrl,
+                data: {'student_id': id},
+                type: 'post',
+                //解决编码问题
+                // scriptCharset: 'utf-8',
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function () {
+                    return true;
+                },
+                success: function (data) {
+                    if(data){
+                        //解析json数据
+                        var data = data;
+                        var student = eval("("+data+")");
+
+                        //赋值
+                        $('#student_id').val(student.student_id);
+                        $('#student_name').val(student.student_name);
+                        $('#gender').val(student.gender);
+                        $('#grade').val(student.grade);
+                        $('#age').val(student.age);
+                    }
+                }
+            })
         }
     
         //表单字段验证
@@ -76,6 +74,10 @@
                 onkeyup:false,
     
                 rules:{
+                    student_name:{
+                        required:true,
+                        rangelength:[1,8],
+                    },
                     gender:{
                         required:true,
                     },
@@ -86,6 +88,10 @@
                     }
                 },
                 messages:{
+                    student_name:{
+                        required:"请填写用户名",
+                        rangelength:"用户名长度不符合规范"
+                    },
                     gender:{
                         required:"请选择性别",
                     },
@@ -114,7 +120,15 @@
             }
         }
     
-    
+        // 初始化表单
+        function initForm() {
+            $('#student_id').empty();
+            $('#student_name').empty();
+            $('#gender option:first').prop('selected', true);
+            $('#grade option:first').prop('selected', true);
+            $('#age').empty();
+        }
+
         /*
         点击添加用户时需要做的操作：
             1.修改提交表单的URL
@@ -122,61 +136,30 @@
             3.清空表单数据
             */
         function setUrl() {
-            // myUrl='/student/add';
-            myUrl='http://localhost:8000/student/';
-            $('#user_name').removeAttr("readonly");
-            $('#form-data input').val("");
-            // $('#tip').html('');
+            myUrl = 'student/';
+            initForm();
         }
     
-    
         function checkForm() {
-    
-            // var formData;
-            // //将表单内容序列化，即可得到相应对象，直接传到后台
-            // //user_id为空时，即当前操作为添加用户操作，此时只序列化除id之外四个属性，添加用户时id自增长。如果id为空也被序列化会报错
-            // if($('#user_id').val()==null||$('#user_id').val()==undefined||$('#user_id').val().length==0){
-            //     formData = $('#user_name,#gender,#age,#grade').serializeArray();
-            //     console.log(formData);
-            // }
-            // //否则为更新操作，user_id为隐藏input，并且已经被赋值，序列化整个表单即可
-            // else{
-            //     formData = $('#form-data').serializeArray();
-            //     console.log(formData);
-            // }
-            // alert('formdata' + formData)
-            var formData = new FormData();
-            if($('#user_id').val()==null||$('#user_id').val()==''||$('#user_id').val().length==0){
-                // formData = $('#user_name,#gender,#age,#grade').serializeArray();
-                formData.append('user_name', $('#user_name').val());
-                formData.append('gender', $('#gender').val());
-                formData.append('grade', $('#grade').val());
-                formData.append('age', $('#age').val());
+            var obj = {};
+
+            obj['student_name'] = $('#student_name').val();
+            obj['gender'] = $('#gender').val();
+            obj['grade'] = $('#grade').val();
+            obj['age'] = $('#age').val();
+
+            if ($('#student_id').val().length!=0) {
+                obj['student_id'] = $('#student_id').val();
             }
-            //否则为更新操作，user_id为隐藏input，并且已经被赋值，序列化整个表单即可
-            else{
-                // formData = $('#form-data').serializeArray();
-                formData.append('user_id', $('#user_id').val());
-                formData.append('user_name', $('#user_name').val());
-                formData.append('gender', $('#gender').val());
-                formData.append('grade', $('#grade').val());
-                formData.append('age', $('#age').val());
-            }
-            // console.log(formData);
+            console.log(obj);
 
             $.ajax({
-                    url:myUrl,      //根据操作传入不同的URL
-                    data:formData,  //传入序列化的表单对象
+                    url: myUrl,      //根据操作传入不同的URL
                     type:"post",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(obj),
                     dataType:'json',
-                    async:false,    //异步传输
                     timeout:50000,
-                    //设置编码
-                    // contentType: "application/x-www-form-urlencoded; charset=utf-8",
-                    // contentType: "'application/json",
-                    // headers:{"X-CSRFToken":$.cookie('csrftoken')},
-                    processData: false,  // 不处理数据
-                    contentType: false,
                     beforeSend:function () {
                         $('#tip').html('<span style="color: cornflowerblue">正在处理...</span>');
                         return true;
@@ -186,7 +169,8 @@
                         if(data){
                             $('#tip').html('<span style="color: green">操作成功！</span>');
                             location.reload(true);
-                        }else{
+                        }
+                        else{
                             $('#tip').html('<span style="color: red">操作失败，请重试</span>');
                         }
                     },
@@ -269,50 +253,58 @@
                             <div class="modal-body">
                                 <form action="" class="form-horizontal">
                                     <!--user_id为隐藏的input，便于update时的传值-->
-                                    <input type="text" id="user_id" name="user_id" hidden>
-                                    <div class="form-group mark_location">
-                                        <span class="start">*</span>
-                                        <label for="user_name" class="col-sm-3 control-label">姓名</label>
+                                    <input type="text" id="student_id" name="student_id" hidden>
+                                    <div class="form-group">
+                                        <label for="student_name" class="col-sm-3 control-label mark_location">
+                                            学生姓名
+                                            <span class="star">*</span>
+                                        </label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="user_name" name="user_name" placeholder="请输入姓名">
+                                            <input type="text" class="form-control" id="student_name" name="student_name" placeholder="请输入姓名">
                                         </div>
                                     </div>
-                                    <div class="form-group mark_location">
-                                        <span class="start">*</span>
-                                        <label for="gender" class="col-sm-3 control-label">性别</label>
+                                    <div class="form-group">
+                                        <label for="gender" class="col-sm-3 control-label mark_location">
+                                            性别
+                                            <span class="star">*</span>
+                                        </label>
                                         <div class="col-sm-9">
                                             <select class="form-control" id="gender" name="gender">
-                                                    <option></option>
-                                                    <option>男</option>
-                                                    <option>女</option>
+                                                <option value="">请选择性别</option>
+                                                <option value="1">男</option>
+                                                <option value="0">女</option>
                                             </select>
-                                            <!-- <input type="text" class="form-control" id="gender" name="gender" placeholder="密码长度在5-20字符之间"> -->
                                         </div>
                                     </div>
                                     <div class="form-group mark_location">
-                                        <label for="grade" class="col-sm-3 control-label">年级</label>
+                                        <label for="grade" class="col-sm-3 control-label mark_location">
+                                            年级
+                                            <span class="star"></span>
+                                        </label>
                                         <div class="col-sm-9">
-                                            <!-- <input type="text" class="form-control" id="grade" name="grade" placeholder="请输入手机号"> -->
                                             <select class="form-control" id="grade" name="grade">
-                                                <option></option>
-                                                <option>一年级</option>
-                                                <option>二年级</option>
-                                                <option>三年级</option>
-                                                <option>四年级</option>
-                                                <option>五年级</option>
-                                                <option>六年级</option>
-                                                <option>初一</option>
-                                                <option>初二</option>
-                                                <option>初三</option>
-                                                <option>高一</option>
-                                                <option>高二</option>
-                                                <option>高三</option>
-                                                <option>其他</option>
+                                                <option value="">请选择年级</option>
+                                                <option value="1">一年级</option>
+                                                <option value="2">二年级</option>
+                                                <option value="3">三年级</option>
+                                                <option value="4">四年级</option>
+                                                <option value="5">五年级</option>
+                                                <option value="6">六年级</option>
+                                                <option value="7">初一</option>
+                                                <option value="8">初二</option>
+                                                <option value="9">初三</option>
+                                                <option value="10">高一</option>
+                                                <option value="11">高二</option>
+                                                <option value="12">高三</option>
+                                                <option value="0">其他</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="form-group mark_location">
-                                        <label for="age" class="col-sm-3 control-label">年龄</label>
+                                        <label for="age" class="col-sm-3 control-label mark_location">
+                                            年龄
+                                            <span class="star"></span>
+                                        </label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control" id="age" name="age" placeholder="请输入年龄">
                                         </div>
@@ -331,32 +323,46 @@
                 </div>
             </form>
             <!-- 表格 -->
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th hidden>id</th>
-                        <th>姓名</th>
-                        <th>性别</th>
-                        <th>年级</th>
-                        <th>年龄</th>
-                        <th>修改</th>
-                    </tr>
-                </thead>
-                <tbody >
-                    <tr th:each="user : ${userlist}">
-                        <td hidden th:text="${user.user_id}"></td>
-                        <td th:text="${user.user_name}"></td>
-                        <td th:text="${user.gender}"></td>
-                        <td th:text="${user.grade}"></td>
-                        <td th:text="${user.age}"></td>
-                        <td>
-                            <!--传入当前用户id-->
-                            <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#updateModal" th:onclick="'javascript: update('+${user.user_id}+')' ">编辑</button>
-                            <button type="button" class="btn btn-danger btn-sm"  th:onclick="'javascript:deleteUser('+${user.user_id}+')' ">删除</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th hidden>id</th>
+                            <th>姓名</th>
+                            <th>性别</th>
+                            <th>年级</th>
+                            <th>年龄</th>
+                            <th>修改</th>
+                        </tr>
+                    </thead>
+                    <tbody >
+                        <tr th:each="user : ${userlist}">
+                            <td hidden th:text="${user.user_id}"></td>
+                            <td th:text="${user.user_name}"></td>
+                            <td th:text="${user.gender}"></td>
+                            <td th:text="${user.grade}"></td>
+                            <td th:text="${user.age}"></td>
+                            <td>
+                                <!--传入当前用户id-->
+                                <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#updateModal" th:onclick="'javascript: update('+${user.user_id}+')' ">编辑</button>
+                                <button type="button" class="btn btn-danger btn-sm"  th:onclick="'javascript:deleteUser('+${user.user_id}+')' ">删除</button>
+                            </td>
+                        </tr>
+                        <tr class="info">
+                            <td class="student_id" value="11" hidden>11</td>
+                            <td class="student_name" value="哈哈">哈哈</td>
+                            <td class="gender" value="0">男</td>
+                            <td class="grade" value="6">六年级</td>
+                            <td class="age" value="12">12</td>
+                            <td>
+                                <!--传入当前用户id-->
+                                <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#updateModal" onclick="update(11)">编辑</button>
+                                <button type="button" class="btn btn-danger btn-sm"  onclick="delete(11)">删除</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </body>

@@ -5,7 +5,7 @@
 
 .table th, .table td { 
 	text-align: center;
-	/*vertical-align: middle!important;*/
+	/* vertical-align: middle!important; */
 }
 
 .table-responsive .table .text-muted{
@@ -42,30 +42,25 @@
 }
 
 /*必填项的**/
-/* @media (min-width: 768px)
+@media (min-width: 768px)
 {
-	.start{
+	.star{
 		color: red;
 		font-weight: bold;
 		position: absolute;
-		left: 140px;
+		right: 5px;
 		top: 10px;
 	}
 }
 
 @media (max-width: 767px)
 {
-	.start{
+	.star{
 		color: red;
 		font-weight: bold;
 		position: absolute;
-		left: 48px;
+		right: 5px;
 		top: 3px;
 	}
-} */
-
-
-/* id */
-.table .hide_id{
-	display: none;
 }
+
