@@ -3,5 +3,5 @@ from .views import *
 
 urlpatterns = [
     path('', StudentView.as_view()),
-    path('', index),
+    path('info/', StudengInfoView.as_view()),
 ]

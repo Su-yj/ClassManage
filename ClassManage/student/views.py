@@ -5,23 +5,29 @@ from django.views import View
 from django.http import JsonResponse, HttpResponse
 from .models import *
 
+"""
+********************************************************外部接口********************************************************
+"""
 
-# Create your views here.
+
 class StudentView(View):
     """学生视图"""
     def get(self, request):
         return render(request, 'student/student.html')
 
+
+class StudengInfoView(View):
+    """学生信息视图"""
     def post(self, request):
         # 处理接收的数据
-        data = self.parse_json(request)
+        data = parse_json(request)
         if not data:
             return JsonResponse({})
         # 处理的方法
         method = {
-            'info': self.info,
             'add': self.add,
-            'update': self.update,
+            'edit': self.edit,
+            'del': self.delete,
         }
         option = data.get('option')
         method = method.get(option)
@@ -30,43 +36,96 @@ class StudentView(View):
 
         return method(data)
 
-    def info(self, data):
-        student_id = data.get('student_id')
-        if student_id:
-            try:
-                student = StudentInfo.objects.get(pk=student_id)
-            except:
-                return JsonResponse({})
-            student_id = student.pk
-            name = student.name
-            gender = student.gender
-            age = student.age
-            grade = student.grade
-            return JsonResponse(
-                {
-                    'code': 0, 
-                    'data': {
-                        'student_id': student_id,
-                        'name': name,
-                        'gender': gender,
-                        'age': age,
-                        'grade': grade,
-                    }
-                }
-            )
-        else:
-            students = StudentInfo.objects.all()
-            for student in students:
-                info = {
-                    
-                }
+    def add(self, data):
+        """
+        添加学生信息
+        :param data:
+        :return:
+        """
+        name = data.get('name')
+        gender = data.get('gender')
+        age = data.get('age')
+        grade = data.get('grade')
 
+        if not all([name, gender]):
+            return JsonResponse({})
 
-        
-    def parse_json(self, request):
+        if age and (age < 3 or age > 50):
+            return JsonResponse({})
+
+        if grade and grade not in [i[0] for i in StudentInfo.GRADE]:
+            return JsonResponse({})
+
         try:
-            data = json.loads(request.body)
-            return data
+            StudentInfo(name=name, gender=gender, age=age, grade=grade).save()
+            return JsonResponse({'code': 0})
         except:
-            return None
+            return JsonResponse({})
+
+    def edit(self, data):
+        """
+        修改学生信息
+        :param data:
+        :return:
+        """
+        _id = data.get('id')
+        name = data.get('name')
+        gender = data.get('gender')
+        age = data.get('age')
+        grade = data.get('grade')
+
+        if not all([_id, name, gender]):
+            return JsonResponse({})
+
+        student = StudentInfo.objects.filter(pk=_id).first()
+        if not student:
+            return JsonResponse({})
+
+        if age and (age < 3 or age > 50):
+            return JsonResponse({})
+
+        if grade and grade not in [i[0] for i in StudentInfo.GRADE]:
+            return JsonResponse({})
+
+        try:
+            student.name = name
+            student.gender = gender
+            student.age = age
+            student.grade = grade
+            student.save()
+            return JsonResponse({'code': 0})
+        except:
+            return JsonResponse({})
+
+    def delete(self, data):
+        """
+        删除学生信息
+        :param data:
+        :return:
+        """
+        _id = data.get('id')
+        student = StudentInfo.objects.filter(pk=_id).first()
+        if not student:
+            return JsonResponse({})
+
+        student.delete()
+        return JsonResponse({'code': 0})
+
+
+"""
+********************************************************内部方法********************************************************
+"""
+
+
+def parse_json(request):
+    """
+    解析json数据
+    :param request: 请求内容
+    :return: data, 请求参数
+    """
+    try:
+        data = json.loads(request.body)
+        return data
+    except:
+        return None
         
