@@ -1,5 +1,6 @@
 $(function () {
 	var error_name = false;
+	var error_gender = false;
 	var error_age = false;
 
 	$('#name').blur(function () {
@@ -38,6 +39,12 @@ $(function () {
 			}
 		}
 	};
+
+	function check_gender(){
+		if ($('#gender').val()=='') {
+			
+		}
+	}
 
 	$('#refer_to').click(function() {
 		check_name();

@@ -30,7 +30,7 @@
 
         // 点击update,并传入id
         function update(id) {
-            myUrl = 'student/info/';
+            myUrl = 'http://localhost:8000/student/info/';
             if(!id){
                 alert('id错误');
                 return false;
@@ -39,10 +39,11 @@
             $.ajax({
                 url: myUrl,
                 data: {'id': id},
-                type: 'post',
+                type: 'get',
+                dataType: 'json',
                 //解决编码问题
                 // scriptCharset: 'utf-8',
-                contentType: "application/json; charset=utf-8",
+                // contentType: "application/json; charset=utf-8",
                 beforeSend: function () {
                     return true;
                 },
@@ -52,12 +53,17 @@
                         var data = data;
                         var student = eval("("+data+")");
 
-                        //赋值
-                        $('#id').val(student.id);
-                        $('#name').val(student.name);
-                        $('#gender').val(student.gender);
-                        $('#grade').val(student.grade);
-                        $('#age').val(student.age);
+                        if(data.code==0) {
+                            //赋值
+                            $('#id').val(student.id);
+                            $('#name').val(student.name);
+                            $('#gender').val(student.gender);
+                            $('#grade').val(student.grade);
+                            $('#age').val(student.age);
+                        }
+                        else{
+                            alert(data.message);
+                        }
                     }
                 }
             })

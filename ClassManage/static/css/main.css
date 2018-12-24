@@ -5,7 +5,7 @@
 
 .table th, .table td { 
 	text-align: center;
-	vertical-align: middle!important;
+	/* vertical-align: middle!important; */
 }
 
 .table-responsive .table .text-muted{
@@ -18,8 +18,11 @@
 	margin-bottom: 8px;
 	/*text-align: center;*/
 	background-color: #d9edf7;
-	border-radius: 5%;
+	/*border-radius: 5%;*/
 	padding: 3px 0;
+	/*border: 1px;*/
+	/*border-bottom-style: solid;*/
+	cursor: pointer;
 }
 
 /*上课时间*/
@@ -41,31 +44,23 @@
 /*必填项的**/
 @media (min-width: 768px)
 {
-	.start{
+	.star{
 		color: red;
 		font-weight: bold;
 		position: absolute;
-		left: 140px;
+		right: 5px;
 		top: 10px;
 	}
 }
 
 @media (max-width: 767px)
 {
-	.start{
+	.star{
 		color: red;
 		font-weight: bold;
 		position: absolute;
-		left: 75px;
+		right: 5px;
 		top: 3px;
 	}
 }
 
-
-/*提示信息*/
-.error_tip{
-	margin-top: -28px;
-	font-size: 12px;
-	color: red;
-	display: none;
-}
