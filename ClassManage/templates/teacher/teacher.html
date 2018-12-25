@@ -111,16 +111,16 @@
                     rangelength: [8, 8],
                     remote: {
                         type: 'POST',
-                        url: '/teacher/checkAcount/',
+                        url: '/teacher/checkAccount/',
                         data: {
-                            acount: function () {
-                                return $('#acount').val();
+                            account: function () {
+                                return $('#account').val();
                             }
                         },
                         dataType: 'json',
                         dataFilter: function(data) {
                             if (data.code == 0) {
-                                if (data.result == 'true') {
+                                if (data.repeat == 'true') {
                                     return true;
                                 }
                                 else {
@@ -147,7 +147,7 @@
             $('#id').val('');
             $('#name').val('');
             $('#gender option:first').prop('selected', true);
-            $('#acount').val('');
+            $('#account').val('');
         }
 
         /*
@@ -167,11 +167,11 @@
             obj['type'] = 'add';
             obj['name'] = $('#name').val();
             obj['gender'] = parseInt($('#gender').val());
-            obj['acount'] = $('#acount').val();
 
             if ($('#id').val().length!=0) {
                 obj['id'] = parseInt($('#id').val());
                 obj['type'] = 'edit';
+                obj['account'] = $('#account').val();
             }
             console.log(JSON.stringify(obj));
             $.ajax({

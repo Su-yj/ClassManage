@@ -5,21 +5,23 @@ import hashlib
 from django.db import models
 
 
-def random_username():
+def random_account():
     """
     获取随机用户名
     :return: 随机用户名
     """
     word = '1234567890qwertyuiopasdfghjklzxcvbnm'
-    username = ''.join(random.sample(word, 8))
-    return username
+    account = ''.join(random.sample(word, 8))
+    while TeacherInfo.objects.filter(account=account).first():
+        random_account()
+    return account
 
 
 # Create your models here.
 class TeacherInfo(models.Model):
     name = models.CharField(verbose_name='老师姓名', max_length=50)
     gender = models.BooleanField(verbose_name='性别', default=False)
-    user = models.CharField(verbose_name='账号', max_length=50, default=random_username)
+    account = models.CharField(verbose_name='账号', max_length=50, default=random_account)
     password = models.CharField(verbose_name='密码', max_length=40, default='fd3d69aafa0d649b44d7d6cdf4c6159937cadac5')
 
     def __str__(self):

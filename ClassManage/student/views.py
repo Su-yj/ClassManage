@@ -7,6 +7,7 @@ from django.http import JsonResponse, HttpResponse
 from .models import *
 
 from utils import errmsg
+from utils.ParseJson import parse_json
 
 """
 ********************************************************外部接口********************************************************
@@ -68,11 +69,10 @@ class StudengInfoView(View):
         method = {
             'add': self.add,
             'edit': self.edit,
-            'del': self.delete,
+            'delete': self.delete,
         }
-        option = data.get('option')
-        method = method.get(option)
-        if not method:
+        option = method.get(data.get('type'))
+        if not option:
             return JsonResponse(errmsg.PARAMETER_ERROR)
 
         return method(data)
@@ -156,16 +156,3 @@ class StudengInfoView(View):
 """
 ********************************************************内部方法********************************************************
 """
-
-
-def parse_json(request):
-    """
-    解析json数据
-    :param request: 请求内容
-    :return: data, 请求参数
-    """
-    try:
-        data = json.loads(request.body.decode('utf-8'))
-        return data
-    except:
-        return None
