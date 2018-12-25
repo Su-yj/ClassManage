@@ -171,13 +171,13 @@
                         return true;
                     },
                     success:function (data) {
-                        console.log(data);
-                        if(data){
+                        if(data.code == 0){
                             $('#tip').html('<span style="color: green">操作成功！</span>');
                             location.reload(true);
                         }
                         else{
                             $('#tip').html('<span style="color: red">操作失败，请重试</span>');
+                            alert(data.message);
                         }
                     },
                     error:function(XMLHttpRequest, textStatus, errorThrown) {
@@ -185,7 +185,6 @@
                         // alert(XMLHttpRequest.readyState);//状态
                         // alert(textStatus);//错误信息
                         alert("出错了");
-    
                     },
                     complete:function () {
     

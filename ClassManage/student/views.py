@@ -16,7 +16,7 @@ from utils import errmsg
 class StudentView(View):
     """学生视图"""
     def get(self, request):
-        return render(request, 'student.html')
+        return render(request, 'student/student.html')
 
 
 class StudengInfoView(View):
@@ -169,4 +169,3 @@ def parse_json(request):
         return data
     except:
         return None
-        

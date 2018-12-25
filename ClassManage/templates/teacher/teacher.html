@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>学生管理</title>
+    <title>老师管理</title>
     <!-- <script type="text/javascript" src="js/set_root.js"></script> -->
     <!-- <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script> -->
     <!-- jquery -->
@@ -26,11 +26,13 @@
 
     <script>
         //定义一个变量用于存储添加和修改时不同的URL
-        var myUrl = '/student/info/';
+        var myUrl = '/teacher/info/';
 
         // 点击update,并传入id
         function update(id) {
             initForm();
+            $('#account').parent().parent().show();
+
             if(!id){
                 alert('id错误');
                 return false;
@@ -61,8 +63,7 @@
                             var gender = 0;
                         }
                         $('#gender').val(gender);
-                        $('#grade').val(data.grade);
-                        $('#age').val(data.age);
+                        $('#account').val(data.account);
                     }
                     else{
                         alert(data.message);
@@ -70,7 +71,7 @@
                 }
             })
         }
-    
+
         //表单字段验证
         //如果按照一般验证的写法，只能调用整个表单的validate函数，而不能调用自定义的user_name验证，所以把两个函数封装成为一个，在点击按钮时调用
         function vali() {
@@ -80,7 +81,7 @@
                 onblur: function(element) { $(element).valid(); },    //鼠标移开验证。这里写onblue:true没有效果
                 onsubmit:true,      //提交时验证（有效）
                 onkeyup:false,
-    
+
                 rules:{
                     name:{
                         required:true,
@@ -89,11 +90,6 @@
                     gender:{
                         required:true,
                     },
-                    age:{
-                        required:false,
-                        digits:true,
-                        range:[3,50]
-                    }
                 },
                 messages:{
                     name:{
@@ -103,24 +99,55 @@
                     gender:{
                         required:"请选择性别",
                     },
-                    age:{
-                        digits:"请填写正确的年龄",
-                        range:"年龄必须介于3-50之间"
-                    }
                 },
                 submitHandler:function (form) {
                     checkForm();
                 }
             });
+
+            if($('#account').parent().parent().css('display')=='block') {
+                $("#account").rules('add', {
+                    required: true,
+                    rangelength: [8, 8],
+                    remote: {
+                        type: 'POST',
+                        url: '/teacher/checkAcount/',
+                        data: {
+                            acount: function () {
+                                return $('#acount').val();
+                            }
+                        },
+                        dataType: 'json',
+                        dataFilter: function(data) {
+                            if (data.code == 0) {
+                                if (data.result == 'true') {
+                                    return true;
+                                }
+                                else {
+                                    return false;
+                                }
+                            }
+                            else {
+                                alert(data.message);
+                                return false;
+                            }
+                        }
+                    },
+                    messages: {
+                        required: '请输入账号',
+                        rangelength: '账号必须为8位',
+                        remote: '账号已存在',
+                    }
+                })
+            }
         }
-    
+
         // 初始化表单
         function initForm() {
             $('#id').val('');
             $('#name').val('');
             $('#gender option:first').prop('selected', true);
-            $('#grade option:first').prop('selected', true);
-            $('#age').val('');
+            $('#acount').val('');
         }
 
         /*
@@ -131,19 +158,18 @@
             */
         function setUrl() {
             initForm();
+            $('#account').parent().parent().hide();
         }
-    
+
         function checkForm() {
             var obj = {};
 
             obj['type'] = 'add';
             obj['name'] = $('#name').val();
             obj['gender'] = parseInt($('#gender').val());
-            obj['grade'] = parseInt($('#grade').val());
-            obj['age'] = parseInt($('#age').val());
+            obj['acount'] = $('#acount').val();
 
             if ($('#id').val().length!=0) {
-                console.log($('#id').val());
                 obj['id'] = parseInt($('#id').val());
                 obj['type'] = 'edit';
             }
@@ -160,12 +186,13 @@
                         return true;
                     },
                     success:function (data) {
-                        if(data){
+                        if(data.code == 0){
                             $('#tip').html('<span style="color: green">操作成功！</span>');
                             location.reload(true);
                         }
                         else{
                             $('#tip').html('<span style="color: red">操作失败，请重试</span>');
+                            alert(data.message);
                         }
                     },
                     error:function(XMLHttpRequest, textStatus, errorThrown) {
@@ -173,16 +200,16 @@
                         // alert(XMLHttpRequest.readyState);//状态
                         // alert(textStatus);//错误信息
                         alert("出错了");
-    
+
                     },
                     complete:function () {
-    
+
                     }
             });
         }
-    
+
     </script>
-        
+
 </head>
 <body>
     <!-- 导航栏 -->
@@ -230,7 +257,7 @@
     <div class="jumbotron">
         <div class="container">
             <!-- Large modal -->
-            <p class="text-right"><button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">添加学生</button></p>
+            <p class="text-right"><button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">添加老师</button></p>
             <!--模态框-->
             <form method="post" name="user" class="form-horizontal" role="form" id="form-data"  style="margin: 20px;" >
                 <div class="modal fade" id="updateModal"   tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
@@ -241,7 +268,7 @@
                                     ×
                                 </button>
                                 <h4 class="modal-title" id="updateModalLabel">
-                                    学生信息
+                                    老师信息
                                 </h4>
                             </div>
                             <div class="modal-body">
@@ -250,7 +277,7 @@
                                     <input type="text" id="id" name="id" hidden>
                                     <div class="form-group">
                                         <label for="name" class="col-sm-3 control-label mark_location">
-                                            学生姓名
+                                            老师姓名
                                             <span class="star">*</span>
                                         </label>
                                         <div class="col-sm-9">
@@ -270,37 +297,13 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="form-group mark_location">
-                                        <label for="grade" class="col-sm-3 control-label mark_location">
-                                            年级
-                                            <span class="star"></span>
+                                    <div class="form-group">
+                                        <label for="account" class="col-sm-3 control-label mark_location">
+                                            账号
+                                            <span class="star">*</span>
                                         </label>
                                         <div class="col-sm-9">
-                                            <select class="form-control" id="grade" name="grade">
-                                                <option value="">请选择年级</option>
-                                                <option value="1">一年级</option>
-                                                <option value="2">二年级</option>
-                                                <option value="3">三年级</option>
-                                                <option value="4">四年级</option>
-                                                <option value="5">五年级</option>
-                                                <option value="6">六年级</option>
-                                                <option value="7">初一</option>
-                                                <option value="8">初二</option>
-                                                <option value="9">初三</option>
-                                                <option value="10">高一</option>
-                                                <option value="11">高二</option>
-                                                <option value="12">高三</option>
-                                                <option value="0">其他</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-group mark_location">
-                                        <label for="age" class="col-sm-3 control-label mark_location">
-                                            年龄
-                                            <span class="star"></span>
-                                        </label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="age" name="age" placeholder="请输入年龄">
+                                            <input type="text" class="form-control" id="account" name="account" placeholder="请输入账号">
                                         </div>
                                     </div>
                                 </form>
@@ -324,8 +327,7 @@
                             <th hidden>id</th>
                             <th>姓名</th>
                             <th>性别</th>
-                            <th>年级</th>
-                            <th>年龄</th>
+                            <th>账号</th>
                             <th>修改</th>
                         </tr>
                     </thead>
@@ -335,7 +337,6 @@
                             <td th:text="${user.user_name}"></td>
                             <td th:text="${user.gender}"></td>
                             <td th:text="${user.grade}"></td>
-                            <td th:text="${user.age}"></td>
                             <td>
                                 <!--传入当前用户id-->
                                 <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#updateModal" th:onclick="'javascript: update('+${user.user_id}+')' ">编辑</button>
@@ -346,8 +347,7 @@
                             <td class="id" value="11" hidden>11</td>
                             <td class="name" value="哈哈">哈哈</td>
                             <td class="gender" value="0">男</td>
-                            <td class="grade" value="6">六年级</td>
-                            <td class="age" value="12">12</td>
+                            <td class="account" value="faeddd">faeddd</td>
                             <td>
                                 <!--传入当前用户id-->
                                 <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#updateModal" onclick="update(11)">编辑</button>

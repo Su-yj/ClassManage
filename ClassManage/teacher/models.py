@@ -42,6 +42,14 @@ class TeacherInfo(models.Model):
         b = base64.b64encode(m.encode())
         return hashlib.sha1(b).hexdigest()
 
+    def check_account(self, account):
+        """
+        检查是否有重复账号
+        :param account: 账号
+        :return: boolean
+        """
+        pass
+
     class Meta:
         verbose_name = '老师信息'
         verbose_name_plural = verbose_name
