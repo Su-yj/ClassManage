@@ -17,8 +17,8 @@ class TeacherView(View):
         return render(request, 'teacher/teacher.html')
 
 
-class CheckAccount(view):
-    """"""
+class CheckAccount(View):
+    """检查老师账号是否有重复"""
     def post(self, request):
         json_data = parse_json(request)
         if not json_data:
@@ -37,7 +37,7 @@ class CheckAccount(view):
 
 
 class TeacherInfoView(View):
-    """docstring for TeacherInfoView"""
+    """老师信息"""
     def post(self, request):
         json_data = parse_json(request)
         if not json_data:

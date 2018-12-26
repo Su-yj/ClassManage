@@ -8,7 +8,7 @@ def parse_json(request):
     :return: data, 请求参数
     """
 	try:
-		json_data = json.loads(request.body.encode())
+		json_data = json.loads(request.body.decode())
 		return json_data
 	except:
 		return None

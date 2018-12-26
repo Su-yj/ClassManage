@@ -112,15 +112,16 @@
                     remote: {
                         type: 'POST',
                         url: '/teacher/checkAccount/',
-                        data: {
-                            account: function () {
-                                return $('#account').val();
-                            }
-                        },
                         dataType: 'json',
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify({
+                            account: $('#account').val()
+                        }),
                         dataFilter: function(data) {
+                            // 解析json
+                            var data = eval("("+data+")");
                             if (data.code == 0) {
-                                if (data.repeat == 'true') {
+                                if (data.repeat == false) {
                                     return true;
                                 }
                                 else {

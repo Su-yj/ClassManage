@@ -75,7 +75,7 @@ class StudengInfoView(View):
         if not option:
             return JsonResponse(errmsg.PARAMETER_ERROR)
 
-        return method(data)
+        return option(data)
 
     def add(self, data):
         """
