@@ -13,7 +13,7 @@ class SubjectInfo(models.Model):
         (3, '兼职'),
     )
     name = models.CharField(verbose_name='科目种类', max_length=50)
-    class_type = models.IntegerField(verbose_name='科目类型', choices=CLASS_TYPE, default=CLASS_TYPE[1][0])
+    kind = models.IntegerField(verbose_name='科目类型', choices=CLASS_TYPE, default=CLASS_TYPE[1][0])
 
     def __str__(self):
         return self.name

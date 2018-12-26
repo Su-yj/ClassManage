@@ -58,8 +58,55 @@ class TeacherInfoView(View):
         name = data.get('name')
         gender = data.get('gender')
 
+        if not all([name, gender]):
+            return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
+
+        try:
+            TeacherInfo(name=name, gender=gender).save()
+            return JsonResponse(errmsg.SUCCESS)
+        except:
+            return JsonResponse(errmsg.DATA_SAVE_ERROR)
+
     def edit(self, data):
-        pass
+        """
+        修改老师信息
+        :param data:
+        :return:
+        """
+        _id = data.get('id')
+        name = data.get('name')
+        gender = data.get('gender')
+        account = data.get('account')
+
+        if not all([_id, name, gender, account]):
+            return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
+
+        teacher = TeacherInfo.objects.filter(pk=_id).first()
+        if not teacher:
+            return JsonResponse(errmsg.NO_SUCH_DATA)
+
+        if len(account) != 8:
+            return JsonResponse(errmsg.PARAMETER_ERROR)
+
+        try:
+            teacher.name = name
+            teacher.gender = gender
+            teacher.account = account
+            student.save()
+            return JsonResponse(errmsg.SUCCESS)
+        except:
+            return JsonResponse(errmsg.DATA_SAVE_ERROR)
 
     def delete(self, data):
-        pass
+        """
+        删除老师信息
+        :param data:
+        :return:
+        """
+        _id = data.get('id')
+        teacher = TeacherInfo.objects.filter(pk=_id).first()
+        if not teacher:
+            return JsonResponse(errmsg.NO_SUCH_DATA)
+
+        teacher.delete()
+        return JsonResponse(errmsg.SUCCESS)

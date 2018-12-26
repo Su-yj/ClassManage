@@ -5,7 +5,7 @@ from .models import *
 # Register your models here.
 @admin.register(SubjectInfo)
 class SubjectInfoAdmin(admin.ModelAdmin):
-    list_display = ['name', 'class_type']
+    list_display = ['name', 'kind']
 
 
 @admin.register(LessonInfo)

@@ -209,6 +209,36 @@
             });
         }
 
+        function delete_one(id) {
+            if(confirm('quedingshanchu?')) {
+                var data = {}
+                data['type'] = 'delete';
+                data['id'] = id;
+                $.ajax({
+                    url: myUrl,
+                    data: JSON.stringify(data),
+                    type: 'post',
+                    dataType: 'json',
+                    //解决编码问题
+                    // scriptCharset: 'utf-8',
+                    // contentType: "application/json; charset=utf-8",
+                    beforeSend: function () {
+                        return true;
+                    },
+                    success: function (data) {
+                        if(data.code==0) {
+                            console.log(data);
+                            alert('删除成功!');
+                            location.reload(true);
+                        }
+                        else{
+                            alert(data.message);
+                        }
+                    }
+                })
+            }
+        }
+
     </script>
 
 </head>
@@ -352,7 +382,7 @@
                             <td>
                                 <!--传入当前用户id-->
                                 <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#updateModal" onclick="update(11)">编辑</button>
-                                <button type="button" class="btn btn-danger btn-sm"  onclick="delete(11)">删除</button>
+                                <button type="button" class="btn btn-danger btn-sm"  onclick="delete_one(11)">删除</button>
                             </td>
                         </tr>
                     </tbody>
