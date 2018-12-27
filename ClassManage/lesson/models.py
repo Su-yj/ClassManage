@@ -35,8 +35,34 @@ class LessonInfo(models.Model):
         verbose_name_plural = verbose_name
 
 
+class LessonOfStudent(models.Model):
+    lesson = models.ForeignKey(verbose_name='课程信息', to=LessonInfo, on_delete=models.CASCADE)
+    student = models.ForeignKey(verbose_name='学生信息', to='student.StudentInfo', on_delete=models.CASCADE)
+    price = models.DecimalField(verbose_name='学生课时费', max_digits=18, decimal_places=2)
+
+    def __str__(self):
+        return self.lesson.name
+
+    class Meta:
+        verbose_name = '学生课程关系表'
+        verbose_name_plural = verbose_name
+
+
+class LessonOfTeacher(models.Model):
+    lesson = models.ForeignKey(verbose_name='课程信息', to=LessonInfo, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(verbose_name='老师信息', to='teacher.TeacherInfo', on_delete=models.CASCADE)
+    price = models.DecimalField(verbose_name='老师课时费', max_digits=18, decimal_places=2)
+
+    def __str__(self):
+        return '%s [%s]' % (self.teacher, self.lesson)
+
+    class Meta:
+        verbose_name = '老师课程关系表'
+        verbose_name_plural = verbose_name
+
+
 class ScheduleLessonInfo(models.Model):
-    lesson = models.ForeignKey(verbose_name='课程', to='teacher.TeacherOfLesson', on_delete=models.CASCADE)
+    lesson = models.ForeignKey(verbose_name='课程', to=LessonOfTeacher, on_delete=models.CASCADE)
     start = models.DateTimeField(verbose_name='开始时间')
     end = models.DateTimeField(verbose_name='结束时间')
 

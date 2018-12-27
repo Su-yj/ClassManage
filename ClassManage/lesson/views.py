@@ -130,3 +130,32 @@ class SubjectInfoView(View):
 
         subject.delete()
         return JsonResponse(errmsg.SUCCESS)
+
+
+class StudentLessonView(View):
+    """学生课程管理视图"""
+    def get(self, request):
+        return render(request, 'lesson/studentoflesson.html')
+
+    def post(self, request):
+        json_data = parse_json(request)
+        if not json_data:
+            return errmsg.PARAMETER_TYPE_ERROR
+
+        _id = json_data.get('id')
+        if not _id:
+            return errmsg.INCOMPLETE_PARAMETERS
+
+        lesson_of_student = LessonOfStudent.objects.filter(pk=_id).first()
+        if not lesson_of_student:
+            return errmsg.NO_SUCH_DATA
+
+        data = {
+            'id': lesson_of_student.id,
+            'student': lesson_of_student.student.id,
+            'subject': lesson_of_student.lesson.subject.id,
+            'price': lesson_of_student.price,
+        }
+        success = copy.deepcopy(errmsg.SUCCESS)
+        success.update({'data': data})
+        return JsonResponse(success)

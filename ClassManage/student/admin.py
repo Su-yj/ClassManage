@@ -6,7 +6,3 @@ from .models import *
 @admin.register(StudentInfo)
 class StudentInfoAdmin(admin.ModelAdmin):
     list_display = ['name', 'show_gender']
-
-@admin.register(StudentOfLesson)
-class StudentOfLessonAdmin(admin.ModelAdmin):
-    list_display = ['student', 'lesson', 'price']

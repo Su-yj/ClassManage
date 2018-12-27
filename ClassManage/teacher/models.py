@@ -55,17 +55,3 @@ class TeacherInfo(models.Model):
     class Meta:
         verbose_name = '老师信息'
         verbose_name_plural = verbose_name
-
-
-class TeacherOfLesson(models.Model):
-    # lesson = models.ForeignKey(verbose_name='学生课程信息', to=StudentOfLesson, on_delete=models.CASCADE)
-    lesson = models.ForeignKey(verbose_name='课程信息', to='lesson.LessonInfo', on_delete=models.CASCADE)
-    teacher = models.ForeignKey(verbose_name='老师信息', to=TeacherInfo, on_delete=models.CASCADE)
-    price = models.DecimalField(verbose_name='老师课时费', max_digits=18, decimal_places=2)
-
-    def __str__(self):
-        return '%s [%s]' % (self.teacher, self.lesson)
-
-    class Meta:
-        verbose_name = '老师课程关系表'
-        verbose_name_plural = verbose_name
