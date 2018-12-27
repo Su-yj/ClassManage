@@ -92,7 +92,7 @@ class TeacherInfoView(View):
             teacher.name = name
             teacher.gender = gender
             teacher.account = account
-            student.save()
+            teacher.save()
             return JsonResponse(errmsg.SUCCESS)
         except:
             return JsonResponse(errmsg.DATA_SAVE_ERROR)

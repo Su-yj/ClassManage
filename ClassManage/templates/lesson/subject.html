@@ -99,6 +99,7 @@
         function initForm() {
             $('#id').val('');
             $('#name').val('');
+            $('#tip').html('');
             $('#kind option:first').prop('selected', true);
         }
 
@@ -159,7 +160,7 @@
         }
 
         function delete_one(id) {
-            if(confirm('quedingshanchu?')) {
+            if(confirm('确定删除吗?')) {
                 var data = {}
                 data['type'] = 'delete';
                 data['id'] = id;
@@ -183,6 +184,9 @@
                         else{
                             alert(data.message);
                         }
+                    },
+                    error: function() {
+                        alert('出错了')
                     }
                 })
             }

@@ -153,6 +153,12 @@ class StudengInfoView(View):
         return JsonResponse(errmsg.SUCCESS)
 
 
+class StudentLessonView(View):
+    """学生课程管理视图"""
+    def get(self, request):
+        return render(request, 'student/studentoflesson.html')
+
+
 """
 ********************************************************内部方法********************************************************
 """

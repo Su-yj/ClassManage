@@ -118,6 +118,7 @@
         function initForm() {
             $('#id').val('');
             $('#name').val('');
+            $('#tip').html('');
             $('#gender option:first').prop('selected', true);
             $('#grade option:first').prop('selected', true);
             $('#age').val('');
@@ -182,7 +183,7 @@
         }
 
         function delete_one(id) {
-            if(confirm('quedingshanchu?')) {
+            if(confirm('确定删除吗?')) {
                 var data = {}
                 data['type'] = 'delete';
                 data['id'] = id;
@@ -206,6 +207,9 @@
                         else{
                             alert(data.message);
                         }
+                    },
+                    error: function() {
+                        alert('出错了')
                     }
                 })
             }
