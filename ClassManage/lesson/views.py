@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.views import View
 from django.http import JsonResponse, HttpResponse
 from .models import *
+from student.models import StudentInfo
 
 from utils import errmsg
 from utils.ParseJson import parse_json
@@ -137,12 +138,10 @@ class StudentLessonView(View):
     def get(self, request):
         return render(request, 'lesson/studentoflesson.html')
 
-    def post(self, request):
-        json_data = parse_json(request)
-        if not json_data:
-            return errmsg.PARAMETER_TYPE_ERROR
 
-        _id = json_data.get('id')
+class StudentLessonInfoView(View):
+    def get(self, request):
+        _id = request.GET.get('id')
         if not _id:
             return errmsg.INCOMPLETE_PARAMETERS
 
@@ -159,3 +158,106 @@ class StudentLessonView(View):
         success = copy.deepcopy(errmsg.SUCCESS)
         success.update({'data': data})
         return JsonResponse(success)
+
+    def post(self, request):
+        # 处理接收的数据
+        data = parse_json(request)
+        print(data)
+        if not data:
+            return JsonResponse(errmsg.PARAMETER_TYPE_ERROR)
+        # 处理的方法
+        method = {
+            'add': self.add,
+            'edit': self.edit,
+            'delete': self.delete,
+        }
+        option = method.get(data.get('type'))
+        if not option:
+            return JsonResponse(errmsg.PARAMETER_ERROR)
+
+        return option(data)
+
+    def add(self, data):
+        """
+        添加学生课程信息
+        :param data:
+        :return:
+        """
+        student = data.get('student')
+        subject = data.get('subject')
+        price = data.get('price')
+
+        if not all([student, subject, price]):
+            return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
+
+        if not all([isinstance(student, int), isinstance(subject, int), isinstance(price, int)]):
+            return JsonResponse(errmsg.PARAMETER_TYPE_ERROR)
+
+        student = StudentInfo.objects.filter(pk=student).first()
+        if not student:
+            return JsonResponse(errmsg.NO_SUCH_DATA)
+
+        subject = SubjectInfo.objects.filter(pk=subject).first()
+        if not subject:
+            return JsonResponse(errmsg.NO_SUCH_DATA)
+
+        name = '%s(%s)' % (student.name, subject.name)
+        try:
+            lesson_info = LessonInfo(name=name, subject=subject)
+            lesson_info.save()
+            LessonOfStudent(lesson=lesson_info, student=student, price=price).save()
+            return JsonResponse(errmsg.SUCCESS)
+        except:
+            return JsonResponse(errmsg.DATA_SAVE_ERROR)
+
+    def edit(self, data):
+        """
+        修改学生课程信息
+        :param data:
+        :return:
+        """
+        _id = data.get('id')
+        student = data.get('student')
+        subject = data.get('subject')
+        price = data.get('price')
+
+        if not all([student, subject, price]):
+            return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
+
+        if not all([isinstance(student, int), isinstance(subject, int), isinstance(price, int)]):
+            return JsonResponse(errmsg.PARAMETER_TYPE_ERROR)
+
+        lesson_of_student = LessonOfStudent.objects.filter(pk=_id).first()
+        if not lesson_of_student:
+            return JsonResponse(errmsg.NO_SUCH_DATA)
+
+        student = StudentInfo.objects.filter(pk=student).first()
+        if not student:
+            return JsonResponse(errmsg.NO_SUCH_DATA)
+
+        subject = SubjectInfo.objects.filter(pk=subject).first()
+        if not subject:
+            return JsonResponse(errmsg.NO_SUCH_DATA)
+
+        name = '%s(%s)' % (student.name, subject.name)
+        try:
+            lesson_info = LessonInfo(name=name, subject=subject)
+            lesson_info.save()
+            LessonOfStudent(lesson=lesson_info, student=student, price=price).save()
+            return JsonResponse(errmsg.SUCCESS)
+        except:
+            return JsonResponse(errmsg.DATA_SAVE_ERROR)
+
+    def delete(self, data):
+        """
+        删除学生课程信息
+        :param data:
+        :return:
+        """
+        _id = data.get('id')
+        subject = SubjectInfo.objects.filter(pk=_id).first()
+        if not subject:
+            return JsonResponse(errmsg.NO_SUCH_DATA)
+
+        subject.delete()
+        return JsonResponse(errmsg.SUCCESS)
