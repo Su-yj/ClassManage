@@ -62,7 +62,7 @@ class LessonOfTeacher(models.Model):
 
 
 class ScheduleLessonInfo(models.Model):
-    lesson = models.ForeignKey(verbose_name='课程', to=LessonOfTeacher, on_delete=models.CASCADE)
+    lesson_of_teacher = models.ForeignKey(verbose_name='老师课程', to=LessonOfTeacher, on_delete=models.CASCADE)
     start = models.DateTimeField(verbose_name='开始时间')
     end = models.DateTimeField(verbose_name='结束时间')
 

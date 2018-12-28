@@ -25,4 +25,4 @@ class LessonOfTeacherAdmin(admin.ModelAdmin):
 
 @admin.register(ScheduleLessonInfo)
 class ScheduleLessonInfoAdmin(admin.ModelAdmin):
-    list_display = ['lesson', 'start', 'end']
+    list_display = ['lesson_of_teacher', 'start', 'end']

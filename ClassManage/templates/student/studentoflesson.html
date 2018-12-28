@@ -111,7 +111,7 @@
             $('#tip').html('');
             $('#id').val('');
             $('#student option:first').prop('selected', true);
-            $('#lesson option:first').prop('selected', true);
+            $('#subject option:first').prop('selected', true);
             $('#price').val('');
         }
 
@@ -130,7 +130,7 @@
 
             obj['type'] = 'add';
             obj['student'] = parseInt($('#student').val());
-            obj['subject'] = parseInt($('#gender').val());
+            obj['subject'] = parseInt($('#subject').val());
             obj['price'] = parseInt($('#price').val());
 
             if ($('#id').val().length!=0) {
