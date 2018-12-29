@@ -5,4 +5,4 @@ from .models import *
 # Register your models here.
 @admin.register(StudentInfo)
 class StudentInfoAdmin(admin.ModelAdmin):
-    list_display = ['name', 'show_gender']
+    list_display = ['name', 'show_gender', 'age', 'grade']

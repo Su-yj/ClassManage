@@ -1,9 +1,8 @@
-import json
 import copy
 
 from django.shortcuts import render
 from django.views import View
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from .models import *
 
 from utils import errmsg
@@ -17,7 +16,13 @@ from utils.ParseJson import parse_json
 class StudentView(View):
     """学生视图"""
     def get(self, request):
-        return render(request, 'student/student.html')
+        student = StudentInfo.objects.all()
+        context = {
+            "title": '学生管理',
+            'modal_title': '添加学生',
+            'student_list': student,
+        }
+        return render(request, 'student/student.html', context)
 
 
 class StudengInfoView(View):
@@ -37,23 +42,16 @@ class StudengInfoView(View):
         except:
             return JsonResponse(errmsg.PARAMETER_TYPE_ERROR)
 
-        # student = StudentInfo.objects.filter(pk=_id).last()
-        # if not student:
-        #     return JsonResponse(errmsg.NO_SUCH_DATA)
+        student = StudentInfo.objects.filter(pk=_id).last()
+        if not student:
+            return JsonResponse(errmsg.NO_SUCH_DATA)
 
-        # data = {
-        #     'id': student.pk,
-        #     'name': student.name,
-        #     'gender': student.gender,
-        #     'age': student.age,
-        #     'grade': student.grade,
-        # }
         data = {
-            'id': 1,
-            'name': 'haha',
-            'gender': False,
-            'age': 34,
-            'grade': 4,
+            'id': student.pk,
+            'name': student.name,
+            'gender': student.gender,
+            'age': student.age,
+            'grade': student.grade,
         }
         success = copy.deepcopy(errmsg.SUCCESS)
         success.update({'data': data})
@@ -115,7 +113,7 @@ class StudengInfoView(View):
         age = data.get('age')
         grade = data.get('grade')
 
-        if not all([_id, name, gender]):
+        if not all([_id, name, gender is not None]):
             return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
 
         student = StudentInfo.objects.filter(pk=_id).first()
