@@ -19,7 +19,15 @@ from utils.ParseJson import parse_json
 class SubjectView(View):
     """科目视图"""
     def get(self, request):
-        return render(request, 'lesson/subject.html')
+        subject_list = SubjectInfo.objects.all()
+        context = {
+            'title': '课程种类',
+            'modal_title': '课程种类',
+            'add_button': '添加课程种类',
+            'subject_list': subject_list,
+            'class_type': SubjectInfo.CLASS_TYPE,
+        }
+        return render(request, 'lesson/subject.html', context)
 
 
 class SubjectInfoView(View):
@@ -34,19 +42,14 @@ class SubjectInfoView(View):
         except:
             return JsonResponse(errmsg.PARAMETER_TYPE_ERROR)
 
-        # subject = SubjectInfo.objects.filter(pk=_id).last()
-        # if not subject:
-        #     return JsonResponse(errmsg.NO_SUCH_DATA)
+        subject = SubjectInfo.objects.filter(pk=_id).last()
+        if not subject:
+            return JsonResponse(errmsg.NO_SUCH_DATA)
 
-        # data = {
-        #     'id': subject.pk,
-        #     'name': subject.name,
-        #     'kind': subject.kind,
-        # }
         data = {
-            'id': 1,
-            'name': 'ddddd',
-            'kind': 1,
+            'id': subject.pk,
+            'name': subject.name,
+            'kind': subject.kind,
         }
         success = copy.deepcopy(errmsg.SUCCESS)
         success.update({'data': data})
@@ -79,7 +82,7 @@ class SubjectInfoView(View):
         name = data.get('name')
         kind = data.get('kind')
 
-        if not all([name, kind]):
+        if not all([name, kind is not None]):
             return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
 
         if kind not in [i[0] for i in SubjectInfo.CLASS_TYPE]:
@@ -101,7 +104,7 @@ class SubjectInfoView(View):
         name = data.get('name')
         kind = data.get('kind')
 
-        if not all([_id, name, kind]):
+        if not all([name, kind is not None]):
             return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
 
         subject = SubjectInfo.objects.filter(pk=_id).first()
@@ -137,7 +140,18 @@ class SubjectInfoView(View):
 class StudentLessonView(View):
     """学生课程管理视图"""
     def get(self, request):
-        return render(request, 'lesson/studentoflesson.html')
+        student_list = StudentInfo.objects.all()
+        subject_list = SubjectInfo.objects.all()
+        student_of_lesson_list = LessonOfStudent.objects.all()
+        context = {
+            'title': '学生课程管理',
+            'modal_title': '学生课程信息',
+            'add_button': '添加学生课程',
+            'student_list': student_list,
+            'subject_list': subject_list,
+            'student_of_lesson_list': student_of_lesson_list,
+        }
+        return render(request, 'lesson/studentoflesson.html', context)
 
 
 class StudentLessonInfoView(View):
@@ -207,13 +221,17 @@ class StudentLessonInfoView(View):
             return JsonResponse(errmsg.NO_SUCH_DATA)
 
         if subject.kind == subject.CLASS_TYPE[2][0]:
-            name = subject.name
+            name = '%s(%s)' % ('小班课', subject.name)
+            lesson_info = LessonInfo.objects.filter(subject=subject).first()
+            if not lesson_info:
+                lesson_info = LessonInfo(name=name, subject=subject)
+                lesson_info.save()
         else:
             name = '%s(%s)' % (student.name, subject.name)
-
-        try:
             lesson_info = LessonInfo(name=name, subject=subject)
             lesson_info.save()
+
+        try:
             LessonOfStudent(lesson=lesson_info, student=student, price=price).save()
             return JsonResponse(errmsg.SUCCESS)
         except:
@@ -252,17 +270,25 @@ class StudentLessonInfoView(View):
             return JsonResponse(errmsg.NO_SUCH_DATA)
 
         if subject.kind == subject.CLASS_TYPE[2][0]:
-            name = subject.name
+            name = '%s(%s)' % ('小班课', subject.name)
+            lesson_info = LessonInfo.objects.filter(subject=subject).first()
+            if not lesson_info:
+                lesson_info = LessonInfo(name=name, subject=subject)
+                lesson_info.save()
+            if lesson_of_student.lesson != lesson_info:
+                if not LessonOfStudent.objects.filter(lesson=lesson_of_student.lesson).count() - 1:
+                    lesson_of_student.lesson.delete()
         else:
             name = '%s(%s)' % (student.name, subject.name)
-
-        try:
             lesson_info = lesson_of_student.lesson
             lesson_info.name = name
             lesson_info.subject = subject
             lesson_info.save()
 
+        try:
             lesson_of_student.student = student
+            lesson_of_student.lesson = lesson_info
+            lesson_of_student.price = price
             lesson_of_student.save()
 
             return JsonResponse(errmsg.SUCCESS)
@@ -282,14 +308,29 @@ class StudentLessonInfoView(View):
 
         lesson_info = lesson_of_student.lesson
         lesson_of_student.delete()
-        lesson_info.delete()
+        if lesson_info.subject.kind == SubjectInfo.CLASS_TYPE[2][0]:
+            if not LessonOfStudent.objects.filter(lesson=lesson_info).count():
+                lesson_info.delete()
+        else:
+            lesson_info.delete()
         return JsonResponse(errmsg.SUCCESS)
 
 
 class TeacherLessonView(View):
     """老师课程管理页面"""
     def get(self, request):
-        return render(request, 'lesson/teacheroflesson.html')
+        teacher_list = TeacherInfo.objects.all()
+        lesson_list = LessonInfo.objects.all()
+        lesson_of_teacher_list = LessonOfTeacher.objects.all()
+        context = {
+            'title': '老师课程管理',
+            'modal_title': '老师课程信息',
+            'add_button': '添加老师课程',
+            'teacher_list': teacher_list,
+            'lesson_list': lesson_list,
+            'lesson_of_teacher_list': lesson_of_teacher_list,
+        }
+        return render(request, 'lesson/teacheroflesson.html', context)
 
 
 class TeacherLessonInfoView(View):

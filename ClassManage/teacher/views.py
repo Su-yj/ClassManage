@@ -14,7 +14,14 @@ from utils.ParseJson import parse_json
 class TeacherView(View):
     """老师视图"""
     def get(self, request):
-        return render(request, 'teacher/teacher.html')
+        teacher_list = TeacherInfo.objects.all()
+        context = {
+            'title': '老师管理',
+            'modal_title': '老师信息',
+            'add_button': '添加老师',
+            'teacher_list': teacher_list,
+        }
+        return render(request, 'teacher/teacher.html', context)
 
 
 class CheckAccount(View):
@@ -25,19 +32,45 @@ class CheckAccount(View):
             return JsonResponse(errmsg.PARAMETER_TYPE_ERROR)
 
         account = json_data.get('account')
-        if not account:
+        _id = json_data.get('id')
+        if not all([_id, account]):
             return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
 
+        teacher = TeacherInfo.objects.filter(pk=_id).first()
+        if not teacher:
+            return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
+
+        repeat = False
+        if teacher.account != account:
+            if TeacherInfo.objects.filter(account=account).count():
+                repeat = True
+
         success = copy.deepcopy(errmsg.SUCCESS)
-        if TeacherInfo.objects.filter(account=account).first():
-            success.update({'repeat': True})
-        else:
-            success.update({'repeat': False})
+        success.update({'repeat': repeat})
         return JsonResponse(success)
 
 
 class TeacherInfoView(View):
     """老师信息"""
+    def get(self, request):
+        _id = request.GET.get('id')
+        if not _id:
+            return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
+
+        teacher = TeacherInfo.objects.filter(pk=_id).first()
+        if not teacher:
+            return JsonResponse(errmsg.NO_SUCH_DATA)
+
+        data = {
+            'id': teacher.pk,
+            'name': teacher.name,
+            'gender': teacher.gender,
+            'account': teacher.account,
+        }
+        success = copy.deepcopy(errmsg.SUCCESS)
+        success.update({'data': data})
+        return JsonResponse(success)
+
     def post(self, request):
         json_data = parse_json(request)
         if not json_data:
@@ -58,7 +91,7 @@ class TeacherInfoView(View):
         name = data.get('name')
         gender = data.get('gender')
 
-        if not all([name, gender]):
+        if not all([name, gender is not None]):
             return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
 
         try:
@@ -78,7 +111,7 @@ class TeacherInfoView(View):
         gender = data.get('gender')
         account = data.get('account')
 
-        if not all([_id, name, gender, account]):
+        if not all([_id, name, gender is not None, account]):
             return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
 
         teacher = TeacherInfo.objects.filter(pk=_id).first()

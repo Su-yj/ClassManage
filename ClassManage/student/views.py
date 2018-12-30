@@ -16,11 +16,13 @@ from utils.ParseJson import parse_json
 class StudentView(View):
     """学生视图"""
     def get(self, request):
-        student = StudentInfo.objects.all()
+        student_list = StudentInfo.objects.all()
         context = {
             "title": '学生管理',
-            'modal_title': '添加学生',
-            'student_list': student,
+            'modal_title': '学生信息',
+            'add_button': '添加学生',
+            'student_list': student_list,
+            'grade_list': StudentInfo.GRADE,
         }
         return render(request, 'student/student.html', context)
 
@@ -86,7 +88,7 @@ class StudengInfoView(View):
         age = data.get('age')
         grade = data.get('grade')
 
-        if not all([name, gender]):
+        if not all([name, gender is not None]):
             return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
 
         if age and (age < 3 or age > 50):

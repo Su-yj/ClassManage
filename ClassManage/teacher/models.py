@@ -12,7 +12,7 @@ def random_account():
     """
     word = '1234567890qwertyuiopasdfghjklzxcvbnm'
     account = ''.join(random.sample(word, 8))
-    while TeacherInfo.objects.filter(account=account).first():
+    while TeacherInfo.objects.filter(account=account).count():
         random_account()
     return account
 

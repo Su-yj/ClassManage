@@ -1,198 +1,130 @@
 {% extends "base.html" %}
-{% block head %}
-    <script>
-        //定义一个变量用于存储添加和修改时不同的URL
-        var myUrl = '/student/info/';
+{% block script %}
+    //定义一个变量用于存储添加和修改时不同的URL
+    var myUrl = '/student/info/';
 
-        // 点击update,并传入id
-        function update(id) {
-            initForm();
-            if(!id){
-                alert('id错误');
-                return false;
-            }
+    // 点击update,并传入id
+    function update(id) {
+        initForm();
+        if(!id){
+            alert('id错误');
+            return false;
+        }
 
-            $.ajax({
-                url: myUrl,
-                data: {'id': id},
-                type: 'get',
-                dataType: 'json',
-                //解决编码问题
-                // scriptCharset: 'utf-8',
-                // contentType: "application/json; charset=utf-8",
-                beforeSend: function () {
-                    return true;
-                },
-                success: function (data) {
-                    if(data.code==0) {
-                        data = data.data;
-                        console.log(data);
-                        //赋值
-                        $('#id').val(data.id);
-                        $('#name').val(data.name);
-                        if(data.gender==true){
-                            var gender = 1;
-                        }
-                        else{
-                            var gender = 0;
-                        }
-                        $('#gender').val(gender);
-                        $('#grade').val(data.grade);
-                        $('#age').val(data.age);
+        $.ajax({
+            url: myUrl,
+            data: {'id': id},
+            type: 'get',
+            dataType: 'json',
+            //解决编码问题
+            // scriptCharset: 'utf-8',
+            // contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                return true;
+            },
+            success: function (data) {
+                if(data.code==0) {
+                    data = data.data;
+                    console.log(data);
+                    //赋值
+                    $('#id').val(data.id);
+                    $('#name').val(data.name);
+                    if(data.gender==true){
+                        var gender = 1;
                     }
                     else{
-                        alert(data.message);
+                        var gender = 0;
                     }
+                    $('#gender').val(gender);
+                    $('#grade').val(data.grade);
+                    $('#age').val(data.age);
                 }
-            })
-        }
-
-        //表单字段验证
-        //如果按照一般验证的写法，只能调用整个表单的validate函数，而不能调用自定义的user_name验证，所以把两个函数封装成为一个，在点击按钮时调用
-        function vali() {
-            //form-data表单验证。
-            $("#form-data").validate({
-                onfocusout:function(element) { $(element).valid(); },
-                onblur: function(element) { $(element).valid(); },    //鼠标移开验证。这里写onblue:true没有效果
-                onsubmit:true,      //提交时验证（有效）
-                onkeyup:false,
-
-                rules:{
-                    name:{
-                        required:true,
-                        rangelength:[1,8],
-                    },
-                    gender:{
-                        required:true,
-                    },
-                    age:{
-                        required:false,
-                        digits:true,
-                        range:[3,50]
-                    }
-                },
-                messages:{
-                    name:{
-                        required:"请填写用户名",
-                        rangelength:"用户名长度不符合规范"
-                    },
-                    gender:{
-                        required:"请选择性别",
-                    },
-                    age:{
-                        digits:"请填写正确的年龄",
-                        range:"年龄必须介于3-50之间"
-                    }
-                },
-                submitHandler:function (form) {
-                    checkForm();
+                else{
+                    alert(data.message);
                 }
-            });
-        }
-
-        // 初始化表单
-        function initForm() {
-            $('#id').val('');
-            $('#name').val('');
-            $('#tip').html('');
-            $('#gender option:first').prop('selected', true);
-            $('#grade option:first').prop('selected', true);
-            $('#age').val('');
-        }
-
-        /*
-        点击添加用户时需要做的操作：
-            1.修改提交表单的URL
-            2.将user_name的readonly属性移除
-            3.清空表单数据
-            */
-        function setUrl() {
-            initForm();
-        }
-
-        function checkForm() {
-            var obj = {};
-
-            obj['type'] = 'add';
-            obj['name'] = $('#name').val();
-            obj['gender'] = parseInt($('#gender').val());
-            obj['grade'] = parseInt($('#grade').val());
-            obj['age'] = parseInt($('#age').val());
-
-            if ($('#id').val().length!=0) {
-                console.log($('#id').val());
-                obj['id'] = parseInt($('#id').val());
-                obj['type'] = 'edit';
             }
-            console.log(JSON.stringify(obj));
-            $.ajax({
-                    url: myUrl,      //根据操作传入不同的URL
-                    type:"post",
-                    contentType: "application/json; charset=utf-8",
-                    data: JSON.stringify(obj),
-                    dataType:'json',
-                    timeout:50000,
-                    beforeSend:function () {
-                        $('#tip').html('<span style="color: cornflowerblue">正在处理...</span>');
-                        return true;
-                    },
-                    success:function (data) {
-                        if(data){
-                            $('#tip').html('<span style="color: green">操作成功！</span>');
-                            location.reload(true);
-                        }
-                        else{
-                            $('#tip').html('<span style="color: red">操作失败，请重试</span>');
-                        }
-                    },
-                    error:function(XMLHttpRequest, textStatus, errorThrown) {
-                        // alert(XMLHttpRequest.status);//状态码
-                        // alert(XMLHttpRequest.readyState);//状态
-                        // alert(textStatus);//错误信息
-                        alert("出错了");
+        })
+    }
 
-                    },
-                    complete:function () {
+    //表单字段验证
+    //如果按照一般验证的写法，只能调用整个表单的validate函数，而不能调用自定义的user_name验证，所以把两个函数封装成为一个，在点击按钮时调用
+    function vali() {
+        //form-data表单验证。
+        $("#form-data").validate({
+            onfocusout:function(element) { $(element).valid(); },
+            onblur: function(element) { $(element).valid(); },    //鼠标移开验证。这里写onblue:true没有效果
+            onsubmit:true,      //提交时验证（有效）
+            onkeyup:false,
 
-                    }
-            });
-        }
-
-        function delete_one(id) {
-            if(confirm('确定删除吗?')) {
-                var data = {}
-                data['type'] = 'delete';
-                data['id'] = id;
-                $.ajax({
-                    url: myUrl,
-                    data: JSON.stringify(data),
-                    type: 'post',
-                    dataType: 'json',
-                    //解决编码问题
-                    // scriptCharset: 'utf-8',
-                    // contentType: "application/json; charset=utf-8",
-                    beforeSend: function () {
-                        return true;
-                    },
-                    success: function (data) {
-                        if(data.code==0) {
-                            console.log(data);
-                            alert('删除成功!');
-                            location.reload(true);
-                        }
-                        else{
-                            alert(data.message);
-                        }
-                    },
-                    error: function() {
-                        alert('出错了')
-                    }
-                })
+            rules:{
+                name:{
+                    required:true,
+                    rangelength:[1,8],
+                },
+                gender:{
+                    required:true,
+                },
+                age:{
+                    required:false,
+                    digits:true,
+                    range:[3,50]
+                }
+            },
+            messages:{
+                name:{
+                    required:"请填写用户名",
+                    rangelength:"用户名长度不符合规范"
+                },
+                gender:{
+                    required:"请选择性别",
+                },
+                age:{
+                    digits:"请填写正确的年龄",
+                    range:"年龄必须介于3-50之间"
+                }
+            },
+            submitHandler:function (form) {
+                checkForm();
             }
-        }
+        });
+    }
 
-    </script>
-{% endblock head %}
+    // 初始化表单
+    function initForm() {
+        $('#id').val('');
+        $('#name').val('');
+        $('#tip').html('');
+        $('#gender option:first').prop('selected', true);
+        $('#grade option:first').prop('selected', true);
+        $('#age').val('');
+    }
+
+    /*
+    点击添加用户时需要做的操作：
+        1.修改提交表单的URL
+        2.将user_name的readonly属性移除
+        3.清空表单数据
+        */
+    function setUrl() {
+        initForm();
+    }
+{% endblock script %}
+
+{% block checkForm %}
+    var obj = {};
+
+    obj['type'] = 'add';
+    obj['name'] = $('#name').val();
+    obj['gender'] = parseInt($('#gender').val());
+    obj['grade'] = parseInt($('#grade').val());
+    obj['age'] = parseInt($('#age').val());
+
+    if ($('#id').val().length!=0) {
+        console.log($('#id').val());
+        obj['id'] = parseInt($('#id').val());
+        obj['type'] = 'edit';
+    }
+{% endblock checkForm %}
 
 {% block navbar %}
     <li><a href="#">课表</a></li>
@@ -244,19 +176,9 @@
             <div class="col-sm-9">
                 <select class="form-control" id="grade" name="grade">
                     <option value="">请选择年级</option>
-                    <option value="1">一年级</option>
-                    <option value="2">二年级</option>
-                    <option value="3">三年级</option>
-                    <option value="4">四年级</option>
-                    <option value="5">五年级</option>
-                    <option value="6">六年级</option>
-                    <option value="7">初一</option>
-                    <option value="8">初二</option>
-                    <option value="9">初三</option>
-                    <option value="10">高一</option>
-                    <option value="11">高二</option>
-                    <option value="12">高三</option>
-                    <option value="0">其他</option>
+                    {% for index, grade in grade_list %}
+                        <option value="{{ index }}">{{ grade }}</option>
+                    {% endfor %}
                 </select>
             </div>
         </div>

@@ -25,6 +25,82 @@
     <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/localization/messages_zh.js"></script> -->
 
     {% block head %}{% endblock head %}
+    <script>
+
+        {% block script %}{% endblock script %}
+
+        function checkForm() {
+
+            {% block checkForm %}{% endblock checkForm %}
+
+            console.log(JSON.stringify(obj));
+            $.ajax({
+                    url: myUrl,      //根据操作传入不同的URL
+                    type:"post",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(obj),
+                    dataType:'json',
+                    timeout:50000,
+                    beforeSend:function () {
+                        $('#tip').html('<span style="color: cornflowerblue">正在处理...</span>');
+                        return true;
+                    },
+                    success:function (data) {
+                        if(data.code==0){
+                            $('#tip').html('<span style="color: green">操作成功！</span>');
+                            location.reload(true);
+                        }
+                        else{
+                            alert(data.message);
+                            $('#tip').html('<span style="color: red">操作失败，请重试</span>');
+                        }
+                    },
+                    error:function(XMLHttpRequest, textStatus, errorThrown) {
+                        // alert(XMLHttpRequest.status);//状态码
+                        // alert(XMLHttpRequest.readyState);//状态
+                        // alert(textStatus);//错误信息
+                        alert("出错了");
+
+                    },
+                    complete:function () {
+
+                    }
+            });
+        }
+
+        function delete_one(id) {
+            if(confirm('确定删除吗?')) {
+                var data = {}
+                data['type'] = 'delete';
+                data['id'] = id;
+                $.ajax({
+                    url: myUrl,
+                    data: JSON.stringify(data),
+                    type: 'post',
+                    dataType: 'json',
+                    //解决编码问题
+                    // scriptCharset: 'utf-8',
+                    // contentType: "application/json; charset=utf-8",
+                    beforeSend: function () {
+                        return true;
+                    },
+                    success: function (data) {
+                        if(data.code==0) {
+                            console.log(data);
+                            location.reload(true);
+                        }
+                        else{
+                            alert(data.message);
+                        }
+                    },
+                    error: function() {
+                        alert('出错了')
+                    }
+                })
+            }
+        }
+
+    </script>
 
 </head>
 <body>
@@ -50,7 +126,7 @@
     <div class="jumbotron">
         <div class="container">
             <!-- Large modal -->
-            <p class="text-right"><button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">添加学生课程</button></p>
+            <p class="text-right"><button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">{{ add_button }}</button></p>
             <!--模态框-->
             <form method="post" name="user" class="form-horizontal" role="form" id="form-data"  style="margin: 20px;" >
                 <div class="modal fade" id="updateModal"   tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
