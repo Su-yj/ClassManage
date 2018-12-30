@@ -1,5 +1,6 @@
 import json
 import copy
+import datetime
 
 from django.shortcuts import render
 from django.views import View
@@ -461,4 +462,113 @@ class TeacherLessonInfoView(View):
             return JsonResponse(errmsg.NO_SUCH_DATA)
 
         lesson_of_teacher.delete()
+        return JsonResponse(errmsg.SUCCESS)
+
+
+class ScheduleView(View):
+    """"""
+    def get(self, request):
+        lesson_info_list = []
+        
+        return render(request, 'lesson/schedule.html')
+
+
+class ScheduleInfoView(View):
+    """"""
+    def get(self, request):
+        _id = request.GET.get('id')
+        if not _id:
+            return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
+
+        schedule_info = ScheduleLessonInfo.objects.filter(pk=_id).first()
+        if not schedule_info:
+            return JsonResponse(errmsg.NO_SUCH_DATA)
+
+        data = {
+            'lesson_of_teacher': schedule_info.lesson_of_teacher.id,
+            'start': schedule_info.start,
+            'end': schedule_info.end,
+        }
+        success = copy.deepcopy(errmsg.SUCCESS)
+        success.update({'data': data})
+        return JsonResponse(success)
+
+    def post(self, request):
+        # 处理接收的数据
+        data = parse_json(request)
+        print(data)
+        if not data:
+            return JsonResponse(errmsg.PARAMETER_TYPE_ERROR)
+        # 处理的方法
+        method = {
+            'add': self.add,
+            'edit': self.edit,
+            'delete': self.delete,
+        }
+        option = method.get(data.get('type'))
+        if not option:
+            return JsonResponse(errmsg.PARAMETER_ERROR)
+
+        return option(data)
+
+    def add(self, data):
+        lesson_of_teacher = data.get('lesson_of_teacher')
+        start = data.get('start')
+        end = data.get('end')
+
+        if not all([lesson_of_teacher, start, end]):
+            return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
+
+        lesson_of_teacher = LessonOfTeacher.objects.filter(pk=lesson_of_teacher).first()
+        if not lesson_of_teacher:
+            return JsonResponse(errmsg.NO_SUCH_DATA)
+
+        try:
+            start_time = datetime.datetime.strptime(start, '%Y%m%d %S:%M')
+            end_time = datetime.datetime.strptime(end, '%Y%m%d %S:%M')
+        except:
+            return JsonResponse(errmsg.PARAMETER_ERROR)
+
+        ScheduleLessonInfo(lesson_of_teacher=lesson_of_teacher, start=start_time, end=end_time).save()
+        return JsonResponse(errmsg.SUCCESS)
+
+    def edit(self, data):
+        _id = data.get('id')
+        lesson_of_teacher = data.get('lesson_of_teacher')
+        start = data.get('start')
+        end = data.get('end')
+
+        if not all([_id, lesson_of_teacher, start, end]):
+            return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
+
+        schedule = ScheduleLessonInfo.objects.filter(pk=_id).first()
+        if not schedule:
+            return JsonResponse(errmsg.NO_SUCH_DATA)
+
+        lesson_of_teacher = LessonOfTeacher.objects.filter(pk=lesson_of_teacher).first()
+        if not lesson_of_teacher:
+            return JsonResponse(errmsg.NO_SUCH_DATA)
+
+        try:
+            start_time = datetime.datetime.strptime(start, '%Y%m%d %S:%M')
+            end_time = datetime.datetime.strptime(end, '%Y%m%d %S:%M')
+        except:
+            return JsonResponse(errmsg.PARAMETER_ERROR)
+
+        schedule.lesson_of_teacher = lesson_of_teacher
+        schedule.start = start_time
+        schedule.end = end_time
+        schedule.save()
+        return JsonResponse(errmsg.SUCCESS)
+
+    def delete(self, data):
+        _id = data.get('id')
+        if not _id:
+            return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
+
+        schedule = ScheduleLessonInfo.objects.filter(pk=_id).first()
+        if not schedule:
+            return JsonResponse(errmsg.NO_SUCH_DATA)
+
+        schedule.delete()
         return JsonResponse(errmsg.SUCCESS)
