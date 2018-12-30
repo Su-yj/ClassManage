@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>老师管理</title>
+    <!-- <script type="text/javascript" src="js/set_root.js"></script> -->
+    <!-- <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script> -->
+    <!-- jquery -->
+    <script src="/static/js/jquery.min.js"></script>
+    <!-- bootstrap js -->
+    <script src="/static/js/bootstrap.min.js"></script>
+    <!-- bootstrap css -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="/static/css/reset.css"> -->
+    <link rel="stylesheet" href="/static/css/main.css">
+    <!--validate验证表单插件-->
+    <script src="/static/js/jquery-1.11.1.js"></script>
+    <script src="/static/js/jquery.validate.min.js"></script>
+    <script src="/static/js/messages_zh.js"></script>
+    <link rel="stylesheet" href="/static/css/validation.css">
+    <!-- <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/lib/jquery.js"></script>
+    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
+    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/localization/messages_zh.js"></script> -->
+
+    <script>
+        //定义一个变量用于存储添加和修改时不同的URL
+        var myUrl = '/teacher/info/';
+
+        // 点击update,并传入id
+        function update(id) {
+            initForm();
+            $('#account').parent().parent().show();
+
+            if(!id){
+                alert('id错误');
+                return false;
+            }
+
+            $.ajax({
+                url: myUrl,
+                data: {'id': id},
+                type: 'get',
+                dataType: 'json',
+                //解决编码问题
+                // scriptCharset: 'utf-8',
+                // contentType: "application/json; charset=utf-8",
+                beforeSend: function () {
+                    return true;
+                },
+                success: function (data) {
+                    if(data.code==0) {
+                        data = data.data;
+                        console.log(data);
+                        //赋值
+                        $('#id').val(data.id);
+                        $('#name').val(data.name);
+                        if(data.gender){
+                            var gender = 1;
+                        }
+                        else{
+                            var gender = 0;
+                        }
+                        $('#gender').val(gender);
+                        $('#account').val(data.account);
+                    }
+                    else{
+                        alert(data.message);
+                    }
+                }
+            })
+        }
+
+        //表单字段验证
+        //如果按照一般验证的写法，只能调用整个表单的validate函数，而不能调用自定义的user_name验证，所以把两个函数封装成为一个，在点击按钮时调用
+        function vali() {
+            //form-data表单验证。
+            $("#form-data").validate({
+                onfocusout:function(element) { $(element).valid(); },
+                onblur: function(element) { $(element).valid(); },    //鼠标移开验证。这里写onblue:true没有效果
+                onsubmit:true,      //提交时验证（有效）
+                onkeyup:false,
+
+                rules:{
+                    name:{
+                        required:true,
+                        rangelength:[1,8],
+                    },
+                    gender:{
+                        required:true,
+                    },
+                },
+                messages:{
+                    name:{
+                        required:"请填写用户名",
+                        rangelength:"用户名长度不符合规范"
+                    },
+                    gender:{
+                        required:"请选择性别",
+                    },
+                },
+                submitHandler:function (form) {
+                    checkForm();
+                }
+            });
+
+            if($('#account').parent().parent().css('display')=='block') {
+                $("#account").rules('add', {
+                    required: true,
+                    rangelength: [8, 8],
+                    remote: {
+                        type: 'POST',
+                        url: '/teacher/checkAccount/',
+                        dataType: 'json',
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify({
+                            account: $('#account').val()
+                        }),
+                        dataFilter: function(data) {
+                            // 解析json
+                            var data = eval("("+data+")");
+                            if (data.code == 0) {
+                                if (data.repeat == false) {
+                                    return true;
+                                }
+                                else {
+                                    return false;
+                                }
+                            }
+                            else {
+                                alert(data.message);
+                                return false;
+                            }
+                        }
+                    },
+                    messages: {
+                        required: '请输入账号',
+                        rangelength: '账号必须为8位',
+                        remote: '账号已存在',
+                    }
+                })
+            }
+        }
+
+        // 初始化表单
+        function initForm() {
+            $('#id').val('');
+            $('#name').val('');
+            $('#tip').html('');
+            $('#gender option:first').prop('selected', true);
+            $('#account').val('');
+        }
+
+        /*
+        点击添加用户时需要做的操作：
+            1.修改提交表单的URL
+            2.将user_name的readonly属性移除
+            3.清空表单数据
+            */
+        function setUrl() {
+            initForm();
+            $('#account').parent().parent().hide();
+        }
+
+        function checkForm() {
+            var obj = {};
+
+            obj['type'] = 'add';
+            obj['name'] = $('#name').val();
+            obj['gender'] = parseInt($('#gender').val());
+
+            if ($('#id').val().length!=0) {
+                obj['id'] = parseInt($('#id').val());
+                obj['type'] = 'edit';
+                obj['account'] = $('#account').val();
+            }
+            console.log(JSON.stringify(obj));
+            $.ajax({
+                    url: myUrl,      //根据操作传入不同的URL
+                    type:"post",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(obj),
+                    dataType:'json',
+                    timeout:50000,
+                    beforeSend:function () {
+                        $('#tip').html('<span style="color: cornflowerblue">正在处理...</span>');
+                        return true;
+                    },
+                    success:function (data) {
+                        if(data.code == 0){
+                            $('#tip').html('<span style="color: green">操作成功！</span>');
+                            location.reload(true);
+                        }
+                        else{
+                            $('#tip').html('<span style="color: red">操作失败，请重试</span>');
+                            alert(data.message);
+                        }
+                    },
+                    error:function(XMLHttpRequest, textStatus, errorThrown) {
+                        // alert(XMLHttpRequest.status);//状态码
+                        // alert(XMLHttpRequest.readyState);//状态
+                        // alert(textStatus);//错误信息
+                        alert("出错了");
+
+                    },
+                    complete:function () {
+
+                    }
+            });
+        }
+
+        function delete_one(id) {
+            if(confirm('确定删除吗?')) {
+                var data = {}
+                data['type'] = 'delete';
+                data['id'] = id;
+                $.ajax({
+                    url: myUrl,
+                    data: JSON.stringify(data),
+                    type: 'post',
+                    dataType: 'json',
+                    //解决编码问题
+                    // scriptCharset: 'utf-8',
+                    // contentType: "application/json; charset=utf-8",
+                    beforeSend: function () {
+                        return true;
+                    },
+                    success: function (data) {
+                        if(data.code==0) {
+                            console.log(data);
+                            alert('删除成功!');
+                            location.reload(true);
+                        }
+                        else{
+                            alert(data.message);
+                        }
+                    },
+                    error: function() {
+                        alert('出错了')
+                    }
+                })
+            }
+        }
+
+    </script>
+
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-default navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">切换导航</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">课程管理系统</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">课表</a></li>
+                    <li><a href="#about">学生课程管理</a></li>
+                    <li><a href="#contact">老师课程管理</a></li>
+                    <!-- <li><a href="#contact">课程种类</a></li> -->
+                    <!-- <li><a href="#contact">学生课程管理</a></li> -->
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            其他 <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="active"><a href="#">学生管理</a></li>
+                            <li><a href="#">老师管理</a></li>
+                            <li><a href="#">课程种类</a></li>
+                            <!-- <li role="separator" class="divider"></li>
+                            <li class="dropdown-header">Nav header</li>
+                            <li><a href="#">Separated link</a></li>
+                            <li><a href="#">One more separated link</a></li> -->
+                        </ul>
+                    </li>
+                </ul>
+                <!-- <ul class="nav navbar-nav navbar-right">
+                    <li><a href="../navbar/">Default</a></li>
+                    <li class="active"><a href="./">Static top <span class="sr-only">(current)</span></a></li>
+                    <li><a href="../navbar-fixed-top/">Fixed top</a></li>
+                </ul> -->
+            </div><!--/.nav-collapse -->
+        </div>
+    </nav>
+    <div class="jumbotron">
+        <div class="container">
+            <!-- Large modal -->
+            <p class="text-right"><button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">添加老师</button></p>
+            <!--模态框-->
+            <form method="post" name="user" class="form-horizontal" role="form" id="form-data"  style="margin: 20px;" >
+                <div class="modal fade" id="updateModal"   tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    ×
+                                </button>
+                                <h4 class="modal-title" id="updateModalLabel">
+                                    老师信息
+                                </h4>
+                            </div>
+                            <div class="modal-body">
+                                <form action="" class="form-horizontal">
+                                    <!--user_id为隐藏的input，便于update时的传值-->
+                                    <input type="text" id="id" name="id" hidden>
+                                    <div class="form-group">
+                                        <label for="name" class="col-sm-3 control-label mark_location">
+                                            老师姓名
+                                            <span class="star">*</span>
+                                        </label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="name" name="name" placeholder="请输入姓名">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="gender" class="col-sm-3 control-label mark_location">
+                                            性别
+                                            <span class="star">*</span>
+                                        </label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" id="gender" name="gender">
+                                                <option value="">请选择性别</option>
+                                                <option value="1">男</option>
+                                                <option value="0">女</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="account" class="col-sm-3 control-label mark_location">
+                                            账号
+                                            <span class="star">*</span>
+                                        </label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="account" name="account" placeholder="请输入账号">
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                <!--type为submit时，会自动调用该表单的验证，但是不会调用自己定义的动态的user_name的验证，
+                                所以把按钮类型改为input，再手动调用封装好的验证函数-->
+                                <button type="input" class="btn btn-primary" onclick="vali();">提交</button>
+                                <span id="tip"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <!-- 表格 -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th hidden>id</th>
+                            <th>姓名</th>
+                            <th>性别</th>
+                            <th>账号</th>
+                            <th>修改</th>
+                        </tr>
+                    </thead>
+                    <tbody >
+                        <tr th:each="user : ${userlist}">
+                            <td hidden th:text="${user.user_id}"></td>
+                            <td th:text="${user.user_name}"></td>
+                            <td th:text="${user.gender}"></td>
+                            <td th:text="${user.grade}"></td>
+                            <td>
+                                <!--传入当前用户id-->
+                                <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#updateModal" th:onclick="'javascript: update('+${user.user_id}+')' ">编辑</button>
+                                <button type="button" class="btn btn-danger btn-sm"  th:onclick="'javascript:deleteUser('+${user.user_id}+')' ">删除</button>
+                            </td>
+                        </tr>
+                        <tr class="info">
+                            <td class="id" value="11" hidden>11</td>
+                            <td class="name" value="哈哈">哈哈</td>
+                            <td class="gender" value="0">男</td>
+                            <td class="account" value="faeddd">faeddd</td>
+                            <td>
+                                <!--传入当前用户id-->
+                                <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#updateModal" onclick="update(11)">编辑</button>
+                                <button type="button" class="btn btn-danger btn-sm"  onclick="delete_one(11)">删除</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
