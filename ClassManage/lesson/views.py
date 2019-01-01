@@ -1,6 +1,7 @@
 import json
 import copy
 import datetime
+import pandas
 
 from django.shortcuts import render
 from django.views import View
@@ -466,15 +467,72 @@ class TeacherLessonInfoView(View):
 
 
 class ScheduleView(View):
-    """"""
+    """课表"""
     def get(self, request):
+        # 所有的课程
+        lesson_of_teacher_list = LessonOfTeacher.objects.all()
+        # 获取本周第一天日期
+        now = datetime.date.today()
+        this_week_start = now - datetime.timedelta(days=now.weekday())
+        # 本周的所有课程
+        schedule = ScheduleLessonInfo.objects.filter(start__gte=this_week_start, start__lt=this_week_start+datetime.timedelta(days=7))
         lesson_info_list = []
-        
-        return render(request, 'lesson/schedule.html')
+        date_list = []
+        morning_list = []
+        afternoon_list = []
+        night_list = []
+        for day in range(7):
+            date = this_week_start + datetime.timedelta(days=day)
+
+            d = '%s月%s日 %s' % (date.month, date.day, self.get_weed_day(date))
+            print(d)
+            date_list.append(d)
+
+            schedule_date = schedule.filter(start__date=date)
+            morning = schedule_date.filter(start__hour__lte=11)
+            afternoon = schedule_date.filter(start__hour__gte=12, start_hour_lt=17)
+            night = schedule_date.filter(start__hour__gte=17)
+            morning_list.append(morning)
+            afternoon_list.append(afternoon)
+            night_list.append(night)
+        lesson_info = {
+            'date_list': date_list,
+            'morning': morning_list,
+            'afternoon': afternoon_list,
+            'night': night_list,
+        }
+        lesson_info_list.append(lesson_info)
+
+        context = {
+            'title': '课表',
+            'modal_title': '课程安排',
+            'add_button': '添加课程',
+            'lesson_of_teacher_list': lesson_of_teacher_list,
+            'lesson_info_list': lesson_info_list,
+        }
+        return render(request, 'lesson/schedule.html', context)
+
+    def get_weed_day(self, date):
+        """
+        获取星期几
+        :param date: 日期
+        :return: 星期几
+        """
+        week_day_dict = {
+            0: '星期一',
+            1: '星期二',
+            2: '星期三',
+            3: '星期四',
+            4: '星期五',
+            5: '星期六',
+            6: '星期天',
+        }
+        day = date.weekday()
+        return week_day_dict[day]
 
 
 class ScheduleInfoView(View):
-    """"""
+    """课表信息"""
     def get(self, request):
         _id = request.GET.get('id')
         if not _id:
@@ -572,3 +630,5 @@ class ScheduleInfoView(View):
 
         schedule.delete()
         return JsonResponse(errmsg.SUCCESS)
+
+
