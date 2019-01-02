@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 
 {% block head %}
+    <!-- datetimepicker时间插件 -->
+    <script src="/static/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="/static/js/bootstrap-datetimepicker.zh-CN.js"></script>
+    <link rel="stylesheet" href="/static/css/bootstrap-datetimepicker.min.css">
     <!-- 时间选择器 -->
     <script>
         $(function(){
@@ -59,7 +63,7 @@
     },"<font>请输入正确的时间格式 (2018-01-01 08:00)</font>");
 
     //定义一个变量用于存储添加和修改时不同的URL
-    var myUrl = 'lesson/schedule/info/';
+    var myUrl = '/lesson/schedule/info/';
 
     // 点击update,并传入id
     function update(id) {
@@ -173,7 +177,7 @@
 
 {% block navbar %}
     <li class="active"><a href="/lesson/schedule/">课表</a></li>
-    <li class="active"><a href="/lesson/student/">学生课程管理</a></li>
+    <li><a href="/lesson/student/">学生课程管理</a></li>
     <li><a href="/lesson/teacher/">老师课程管理</a></li>
     <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -232,7 +236,7 @@
         <tr>
             <td>时间</td>
             {% for date in lesson_info.date_list %}
-                <td>date</td>
+                <td>{{ date }}</td>
             {% endfor %}
         </tr>
     </thead>
@@ -243,9 +247,9 @@
             <td class="text-muted">
                 {% for lesson in morning %}
                 <div class="lesson" data-toggle="modal" data-target="#updateModal" onclick="update({{ lesson.id }})">
-                    <div class="lesson_info">{{ lesson }}</div>
-                    <div class="start_time">{{ lesson.start }}</div>
-                    <div class="end_time">{{ lesson.end }}</div>
+                    <div class="lesson_info">{{ lesson.lesson_of_teacher }}</div>
+                    <div class="start_time">开始时间 {{ lesson.start|date:'m-d H:i' }}</div>
+                    <div class="end_time">结束时间 {{ lesson.end|date:'H:i' }}</div>
                 </div>
                 {% endfor %}
             </td>
@@ -257,9 +261,9 @@
             <td class="text-muted">
                 {% for lesson in afternoon %}
                 <div class="lesson" data-toggle="modal" data-target="#updateModal" onclick="update({{ lesson.id }})">
-                    <div class="lesson_info">{{ lesson }}</div>
-                    <div class="start_time">{{ lesson.start }}</div>
-                    <div class="end_time">{{ lesson.end }}</div>
+                    <div class="lesson_info">{{ lesson.lesson_of_teacher }}</div>
+                    <div class="start_time">开始时间&nbsp;&nbsp;{{ lesson.start|date:'H:i' }}</div>
+                    <div class="end_time">{{ lesson.end|date:'H:i' }}</div>
                 </div>
                 {% endfor %}
             </td>
@@ -271,9 +275,9 @@
             <td class="text-muted">
                 {% for lesson in night %}
                 <div class="lesson" data-toggle="modal" data-target="#updateModal" onclick="update({{ lesson.id }})">
-                    <div class="lesson_info">{{ lesson }}</div>
-                    <div class="start_time">{{ lesson.start }}</div>
-                    <div class="end_time">{{ lesson.end }}</div>
+                    <div class="lesson_info">{{ lesson.lesson_of_teacher }}</div>
+                    <div class="start_time">{{ lesson.start|date:'Y-m-d H:i' }}</div>
+                    <div class="end_time">{{ lesson.end|date:'H:i' }}</div>
                 </div>
                 {% endfor %}
             </td>

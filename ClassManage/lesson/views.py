@@ -1,7 +1,6 @@
 import json
 import copy
 import datetime
-import pandas
 
 from django.shortcuts import render
 from django.views import View
@@ -485,12 +484,11 @@ class ScheduleView(View):
             date = this_week_start + datetime.timedelta(days=day)
 
             d = '%s月%s日 %s' % (date.month, date.day, self.get_weed_day(date))
-            print(d)
             date_list.append(d)
 
             schedule_date = schedule.filter(start__date=date)
             morning = schedule_date.filter(start__hour__lte=11)
-            afternoon = schedule_date.filter(start__hour__gte=12, start_hour_lt=17)
+            afternoon = schedule_date.filter(start__hour__range=(12, 16))
             night = schedule_date.filter(start__hour__gte=17)
             morning_list.append(morning)
             afternoon_list.append(afternoon)
@@ -582,8 +580,8 @@ class ScheduleInfoView(View):
             return JsonResponse(errmsg.NO_SUCH_DATA)
 
         try:
-            start_time = datetime.datetime.strptime(start, '%Y%m%d %S:%M')
-            end_time = datetime.datetime.strptime(end, '%Y%m%d %S:%M')
+            start_time = datetime.datetime.strptime(start, '%Y-%m-%d %H:%M')
+            end_time = datetime.datetime.strptime(end, '%Y-%m-%d %H:%M')
         except:
             return JsonResponse(errmsg.PARAMETER_ERROR)
 
