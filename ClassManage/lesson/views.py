@@ -474,7 +474,7 @@ class ScheduleView(View):
         now = datetime.date.today()
         this_week_start = now - datetime.timedelta(days=now.weekday())
         # 本周的所有课程
-        schedule = ScheduleLessonInfo.objects.filter(start__gte=this_week_start, start__lt=this_week_start+datetime.timedelta(days=7))
+        schedule = ScheduleLessonInfo.objects.filter(start__gte=this_week_start, start__lt=this_week_start+datetime.timedelta(days=7)).order_by('start', 'end')
         lesson_info_list = []
         date_list = []
         morning_list = []
@@ -541,9 +541,10 @@ class ScheduleInfoView(View):
             return JsonResponse(errmsg.NO_SUCH_DATA)
 
         data = {
+            'id': schedule_info.pk,
             'lesson_of_teacher': schedule_info.lesson_of_teacher.id,
-            'start': schedule_info.start,
-            'end': schedule_info.end,
+            'start': schedule_info.start.strftime('%Y-%m-%d %H:%M'),
+            'end': schedule_info.end.strftime('%Y-%m-%d %H:%M'),
         }
         success = copy.deepcopy(errmsg.SUCCESS)
         success.update({'data': data})
@@ -606,8 +607,8 @@ class ScheduleInfoView(View):
             return JsonResponse(errmsg.NO_SUCH_DATA)
 
         try:
-            start_time = datetime.datetime.strptime(start, '%Y%m%d %S:%M')
-            end_time = datetime.datetime.strptime(end, '%Y%m%d %S:%M')
+            start_time = datetime.datetime.strptime(start, '%Y-%m-%d %H:%M')
+            end_time = datetime.datetime.strptime(end, '%Y-%m-%d %H:%M')
         except:
             return JsonResponse(errmsg.PARAMETER_ERROR)
 

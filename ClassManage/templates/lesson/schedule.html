@@ -141,7 +141,7 @@
     }
 
     // 初始化模态框
-    function initModal() {
+    function initForm() {
         $('#tip').empty();
         $('#id').val('');
         $('#lesson_of_teacher option:first').prop('selected', true);
@@ -156,7 +156,7 @@
         3.清空表单数据
         */
     function setUrl() {
-        initModal();
+        initForm();
     }
 {% endblock script %}
 
@@ -249,7 +249,7 @@
                 <div class="lesson" data-toggle="modal" data-target="#updateModal" onclick="update({{ lesson.id }})">
                     <div class="lesson_info">{{ lesson.lesson_of_teacher }}</div>
                     <div class="start_time">开始时间 {{ lesson.start|date:'m-d H:i' }}</div>
-                    <div class="end_time">结束时间 {{ lesson.end|date:'H:i' }}</div>
+                    <div class="end_time">结束时间 {{ lesson.end|date:'m-d H:i' }}</div>
                 </div>
                 {% endfor %}
             </td>
@@ -262,8 +262,8 @@
                 {% for lesson in afternoon %}
                 <div class="lesson" data-toggle="modal" data-target="#updateModal" onclick="update({{ lesson.id }})">
                     <div class="lesson_info">{{ lesson.lesson_of_teacher }}</div>
-                    <div class="start_time">开始时间&nbsp;&nbsp;{{ lesson.start|date:'H:i' }}</div>
-                    <div class="end_time">{{ lesson.end|date:'H:i' }}</div>
+                    <div class="start_time">开始时间 {{ lesson.start|date:'m-d H:i' }}</div>
+                    <div class="end_time">结束时间 {{ lesson.end|date:'m-d H:i' }}</div>
                 </div>
                 {% endfor %}
             </td>
@@ -276,8 +276,8 @@
                 {% for lesson in night %}
                 <div class="lesson" data-toggle="modal" data-target="#updateModal" onclick="update({{ lesson.id }})">
                     <div class="lesson_info">{{ lesson.lesson_of_teacher }}</div>
-                    <div class="start_time">{{ lesson.start|date:'Y-m-d H:i' }}</div>
-                    <div class="end_time">{{ lesson.end|date:'H:i' }}</div>
+                    <div class="start_time">开始时间 {{ lesson.start|date:'m-d H:i' }}</div>
+                    <div class="end_time">结束时间 {{ lesson.end|date:'m-d H:i' }}</div>
                 </div>
                 {% endfor %}
             </td>

@@ -26,15 +26,15 @@
 }
 
 /*上课时间*/
-.lesson_time{
-	color: #d37c00;
+.start_time, .end_time{
+	color: #323232;
 	font-weight: bold;
 }
 
 /*课程信息*/
 .lesson_info{
 	font-weight: bold;
-	color: #323232;
+	color: #d37c00;
 }
 
 .mark_location{
