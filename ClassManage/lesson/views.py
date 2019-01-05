@@ -468,38 +468,44 @@ class TeacherLessonInfoView(View):
 class ScheduleView(View):
     """课表"""
     def get(self, request):
+        date = request.GET.get('date')
+        if not date:
+            # 今天日期
+            now = datetime.date.today()
+        else:
+            now = datetime.datetime.strptime(date, '%Y-%m-%d').date()
         # 所有的课程
         lesson_of_teacher_list = LessonOfTeacher.objects.all()
-        # 获取本周第一天日期
-        now = datetime.date.today()
-        this_week_start = now - datetime.timedelta(days=now.weekday())
-        # 本周的所有课程
-        schedule = ScheduleLessonInfo.objects.filter(start__gte=this_week_start, start__lt=this_week_start+datetime.timedelta(days=7)).order_by('start', 'end')
         lesson_info_list = []
-        date_list = []
-        morning_list = []
-        afternoon_list = []
-        night_list = []
-        for day in range(7):
-            date = this_week_start + datetime.timedelta(days=day)
+        for i in range(2):
+            # 获取本周第一天日期
+            this_week_start = now - datetime.timedelta(days=now.weekday() - 7*i)
+            # 本周的所有课程
+            schedule = ScheduleLessonInfo.objects.filter(start__gte=this_week_start, start__lt=this_week_start+datetime.timedelta(days=7)).order_by('start', 'end')
+            date_list = []
+            morning_list = []
+            afternoon_list = []
+            night_list = []
+            for day in range(7):
+                date = this_week_start + datetime.timedelta(days=day)
 
-            d = '%s月%s日 %s' % (date.month, date.day, self.get_weed_day(date))
-            date_list.append(d)
+                d = '%s月%s日 %s' % (date.month, date.day, self.get_weed_day(date))
+                date_list.append(d)
 
-            schedule_date = schedule.filter(start__date=date)
-            morning = schedule_date.filter(start__hour__lte=11)
-            afternoon = schedule_date.filter(start__hour__range=(12, 16))
-            night = schedule_date.filter(start__hour__gte=17)
-            morning_list.append(morning)
-            afternoon_list.append(afternoon)
-            night_list.append(night)
-        lesson_info = {
-            'date_list': date_list,
-            'morning': morning_list,
-            'afternoon': afternoon_list,
-            'night': night_list,
-        }
-        lesson_info_list.append(lesson_info)
+                schedule_date = schedule.filter(start__date=date)
+                morning = schedule_date.filter(start__hour__lte=11)
+                afternoon = schedule_date.filter(start__hour__range=(12, 16))
+                night = schedule_date.filter(start__hour__gte=17)
+                morning_list.append(morning)
+                afternoon_list.append(afternoon)
+                night_list.append(night)
+            lesson_info = {
+                'date_list': date_list,
+                'morning': morning_list,
+                'afternoon': afternoon_list,
+                'night': night_list,
+            }
+            lesson_info_list.append(lesson_info)
 
         context = {
             'title': '课表',

@@ -126,7 +126,25 @@
     <div class="jumbotron">
         <div class="container">
             <!-- Large modal -->
-            <p class="text-right"><button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">{{ add_button }}</button></p>
+            <!--<p class="text-left">-->
+                <!--<button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="prev()">上一周</button>-->
+            <!--</p>-->
+            <!--<p class="text-right"><button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">{{ add_button }}</button></p>-->
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-8">
+                    {% block search %}{% endblock search %}
+                </div>
+                <div class="col-xs-6 col-md-4">
+                    <p class="text-right"><button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">{{ add_button }}</button></p>
+                </div>
+                <!--<div class="col-md-10">-->
+                    <!--<button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="prev()">上一周</button>-->
+                <!--</div>-->
+                <!--<div class="col-md-2">-->
+                    <!--<button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">{{ add_button }}</button>-->
+                    <!--<p class="text-right"><button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">{{ add_button }}</button></p>-->
+                <!--</div>-->
+            </div>
             <!--模态框-->
             <form method="post" name="user" class="form-horizontal" role="form" id="form-data"  style="margin: 20px;" >
                 <div class="modal fade" id="updateModal"   tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">

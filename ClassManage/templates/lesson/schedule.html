@@ -158,6 +158,39 @@
     function setUrl() {
         initForm();
     }
+
+    /* 获取url参数 */
+    function getUrlParam(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+        var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+        if (r != null) return unescape(r[2]); return null; //返回参数值
+    }
+
+    /* 获取当前日期 */
+    function getFormatDate(date, n){
+        var date = date;
+        var year,month,day ;
+        date.setDate(date.getDate()+n*7);
+        year = date.getFullYear();
+        month = date.getMonth()+1;
+        day = date.getDate() ;
+        s = year + '-' + ( month < 10 ? ( '0' + month ) : month ) + '-' + ( day < 10 ? ( '0' + day ) : day) ;
+        return s ;
+    }
+
+    function week(num) {
+        var strDate = getUrlParam('date');
+        if(strDate==null){
+            date = new Date();
+        }
+        else{
+            date = new Date(Date.parse(strDate));
+        }
+        date = getFormatDate(date, num);
+        url = location.pathname + '?date=' + date;
+        window.location.href = url;
+    }
+
 {% endblock script %}
 
 {% block checkForm %}
@@ -190,6 +223,11 @@
         </ul>
     </li>
 {% endblock navbar %}
+
+{% block search %}
+<button type="button" class="btn btn-info" onclick="week(-1)">上一周</button>
+<button type="button" class="btn btn-info" onclick="week(1)">下一周</button>
+{% endblock search %}
 
 {% block modal_form %}
     <form action="" class="form-horizontal">
@@ -246,10 +284,15 @@
             {% for morning in lesson_info.morning %}
             <td class="text-muted">
                 {% for lesson in morning %}
-                <div class="lesson" data-toggle="modal" data-target="#updateModal" onclick="update({{ lesson.id }})">
-                    <div class="lesson_info">{{ lesson.lesson_of_teacher }}</div>
-                    <div class="start_time">开始时间 {{ lesson.start|date:'m-d H:i' }}</div>
-                    <div class="end_time">结束时间 {{ lesson.end|date:'m-d H:i' }}</div>
+                <div class="lesson">
+                    <div data-toggle="modal" data-target="#updateModal" onclick="update({{ lesson.id }})">
+                        <div class="lesson_info">{{ lesson.lesson_of_teacher }}</div>
+                        <div class="start_time">{{ lesson.start|date:'m-d H:i' }}</div>
+                        <div class="end_time">{{ lesson.end|date:'m-d H:i' }}</div>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-danger btn-xs" onclick="delete_one({{ lesson.id }})">删除</button>
+                    </div>
                 </div>
                 {% endfor %}
             </td>
@@ -260,10 +303,15 @@
             {% for afternoon in lesson_info.afternoon %}
             <td class="text-muted">
                 {% for lesson in afternoon %}
-                <div class="lesson" data-toggle="modal" data-target="#updateModal" onclick="update({{ lesson.id }})">
-                    <div class="lesson_info">{{ lesson.lesson_of_teacher }}</div>
-                    <div class="start_time">开始时间 {{ lesson.start|date:'m-d H:i' }}</div>
-                    <div class="end_time">结束时间 {{ lesson.end|date:'m-d H:i' }}</div>
+                <div class="lesson">
+                    <div data-toggle="modal" data-target="#updateModal" onclick="update({{ lesson.id }})">
+                        <div class="lesson_info">{{ lesson.lesson_of_teacher }}</div>
+                        <div class="start_time">{{ lesson.start|date:'m-d H:i' }}</div>
+                        <div class="end_time">{{ lesson.end|date:'m-d H:i' }}</div>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-danger btn-xs" onclick="delete_one({{ lesson.id }})">删除</button>
+                    </div>
                 </div>
                 {% endfor %}
             </td>
@@ -274,10 +322,15 @@
             {% for night in lesson_info.night %}
             <td class="text-muted">
                 {% for lesson in night %}
-                <div class="lesson" data-toggle="modal" data-target="#updateModal" onclick="update({{ lesson.id }})">
-                    <div class="lesson_info">{{ lesson.lesson_of_teacher }}</div>
-                    <div class="start_time">开始时间 {{ lesson.start|date:'m-d H:i' }}</div>
-                    <div class="end_time">结束时间 {{ lesson.end|date:'m-d H:i' }}</div>
+                <div class="lesson">
+                    <div data-toggle="modal" data-target="#updateModal" onclick="update({{ lesson.id }})">
+                        <div class="lesson_info">{{ lesson.lesson_of_teacher }}</div>
+                        <div class="start_time">{{ lesson.start|date:'m-d H:i' }}</div>
+                        <div class="end_time">{{ lesson.end|date:'m-d H:i' }}</div>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-danger btn-xs" onclick="delete_one({{ lesson.id }})">删除</button>
+                    </div>
                 </div>
                 {% endfor %}
             </td>
