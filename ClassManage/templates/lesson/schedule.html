@@ -72,6 +72,7 @@
             alert('id错误');
             return false;
         }
+        $('.delete').show();
 
         $.ajax({
             url: myUrl,
@@ -93,6 +94,7 @@
                     $('#lesson_of_teacher').val(data.lesson_of_teacher);
                     $('#start').val(data.start);
                     $('#end').val(data.end);
+                    $('.delete').attr('onclick', 'delete_one('+data.id+');');
                 }
                 else{
                     alert(data.message);
@@ -147,6 +149,7 @@
         $('#lesson_of_teacher option:first').prop('selected', true);
         $('#start').val('');
         $('#end').val('');
+        $('.delete').hide();
     };
 
     /*
@@ -268,13 +271,17 @@
     </form>
 {% endblock modal_form %}
 
+{% block delete_btn %}
+    <button type="button" class="btn btn-danger delete">删除</button>
+{% endblock delete_btn %}
+
 {% block table %}
     {% for lesson_info in lesson_info_list %}
     <thead>
         <tr>
-            <td>时间</td>
+            <th>时间</th>
             {% for date in lesson_info.date_list %}
-                <td>{{ date }}</td>
+                <th>{{ date }}</th>
             {% endfor %}
         </tr>
     </thead>
@@ -290,9 +297,9 @@
                         <div class="start_time">{{ lesson.start|date:'m-d H:i' }}</div>
                         <div class="end_time">{{ lesson.end|date:'m-d H:i' }}</div>
                     </div>
-                    <div>
-                        <button type="button" class="btn btn-danger btn-xs" onclick="delete_one({{ lesson.id }})">删除</button>
-                    </div>
+                    <!--<div>-->
+                        <!--<button type="button" class="btn btn-danger btn-xs" onclick="delete_one({{ lesson.id }})">删除</button>-->
+                    <!--</div>-->
                 </div>
                 {% endfor %}
             </td>
@@ -309,9 +316,9 @@
                         <div class="start_time">{{ lesson.start|date:'m-d H:i' }}</div>
                         <div class="end_time">{{ lesson.end|date:'m-d H:i' }}</div>
                     </div>
-                    <div>
-                        <button type="button" class="btn btn-danger btn-xs" onclick="delete_one({{ lesson.id }})">删除</button>
-                    </div>
+                    <!--<div>-->
+                        <!--<button type="button" class="btn btn-danger btn-xs" onclick="delete_one({{ lesson.id }})">删除</button>-->
+                    <!--</div>-->
                 </div>
                 {% endfor %}
             </td>
@@ -328,9 +335,9 @@
                         <div class="start_time">{{ lesson.start|date:'m-d H:i' }}</div>
                         <div class="end_time">{{ lesson.end|date:'m-d H:i' }}</div>
                     </div>
-                    <div>
-                        <button type="button" class="btn btn-danger btn-xs" onclick="delete_one({{ lesson.id }})">删除</button>
-                    </div>
+                    <!--<div>-->
+                        <!--<button type="button" class="btn btn-danger btn-xs" onclick="delete_one({{ lesson.id }})">删除</button>-->
+                    <!--</div>-->
                 </div>
                 {% endfor %}
             </td>

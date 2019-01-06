@@ -94,7 +94,7 @@
                         }
                     },
                     error: function() {
-                        alert('出错了')
+                        alert('出错了');
                     }
                 })
             }
@@ -147,7 +147,7 @@
             </div>
             <!--模态框-->
             <form method="post" name="user" class="form-horizontal" role="form" id="form-data"  style="margin: 20px;" >
-                <div class="modal fade" id="updateModal"   tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+                <div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -165,6 +165,7 @@
                                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
                                 <!--type为submit时，会自动调用该表单的验证，但是不会调用自己定义的动态的user_name的验证，
                                 所以把按钮类型改为input，再手动调用封装好的验证函数-->
+                                {% block delete_btn %}{% endblock delete_btn %}
                                 <button type="input" class="btn btn-primary" onclick="vali();">提交</button>
                                 <span id="tip"></span>
                             </div>

@@ -626,6 +626,8 @@ class ScheduleInfoView(View):
 
     def delete(self, data):
         _id = data.get('id')
+        print('----------------------')
+        print(data)
         if not _id:
             return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
 

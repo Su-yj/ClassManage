@@ -1,6 +1,25 @@
 /*表格样式重写*/
-.table-responsive .table thead td{
+/*.table-responsive .table thead td{
 	font-weight: bold;
+}*/
+.table{
+    background-color: #fff;
+}
+
+.jumbotron{
+    background-color: #fff;
+}
+
+thead{
+    border: 2px solid #000;
+}
+
+tbody{
+    border: 2px solid #000;
+}
+
+.table-bordered tbody tr td, .table-bordered thead tr th, .table-bordered tbody tr th{
+    border: 1px solid #000;
 }
 
 .table th, .table td { 
@@ -8,7 +27,7 @@
 	/* vertical-align: middle!important; */
 }
 
-.table-responsive .table .text-muted{
+.table-responsive .table{
 	padding: 2px;
 	color: #000;
 }
