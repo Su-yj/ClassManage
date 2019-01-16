@@ -29,50 +29,51 @@ class StudentPriceView(View):
     def student_all_price(self, request):
         """学生价格统计总表"""
         date = request.GET.get('date')
-        try:
+        if date:
+            try:
+                date1 = datetime.datetime.strptime(date, '%Y%m')
+            except:
+                return JsonResponse(errmsg.PARAMETER_ERROR)
+        else:
+            year = datetime.datetime.today().year
+            month = datetime.datetime.today().month
+            date = '%s%s' % (year, month)
             date1 = datetime.datetime.strptime(date, '%Y%m')
-        except:
-            return JsonResponse(errmsg.PARAMETER_ERROR)
         date2 = date1 + relativedelta(months=1)
 
-        schedules = ScheduleLessonInfo.objects.filter(start__gte=date1, start__lt=date2)
+        schedules = ScheduleLessonInfo.objects.filter(start__gte=date1, start__lt=date2).values_list('id', flat=True)
+        print(schedules)
         price_info_list = PriceInfo.objects.filter(schedule__in=schedules)
+        print('-'*50)
+        print(price_info_list)
 
         temp = {}
         for price_info in price_info_list:
             student = price_info.student
-            student_price_info = temp.get(student)
+            lesson = price_info.schedule.lesson_of_teacher.lesson
+            lesson_of_student = LessonOfStudent.objects.filter(lesson=lesson, student=student).first()
+            price_hour = lesson_of_student.price
+            student_price_info = temp.get(student.id)
             if not student_price_info:
                 student_price_info = {
+                    'id': student.id,
+                    'name': student.name,
                     'hour': 0,
                     'price': 0,
                 }
-
             hour = student_price_info.get('hour') + self.get_hour(price_info)
-            price =
+            price = student_price_info.get('price') + hour * price_hour + price_info.more_price
+            student_price_info.update({'hour': hour, 'price': price})
+            temp.update({student.id: student_price_info})
+        student_price_list = list(temp.values())
+        context = {
+            'title': '学生价格统计',
+            'student_price_list': student_price_list,
+        }
+        return render(request, 'price/student_price.html', context)
 
-
-
-
-        temp = []
-        for schedule in schedules:
-            lesson = schedule.lesson_of_teacher.lesson
-            lesson_of_students = LessonOfStudent.objects.filter(lesson=lesson)
-            hour = self.get_hour(schedule)
-            for lesson_of_student in lesson_of_students:
-                price = lesson_of_student.price
-                name = lesson_of_student.student.name
-                student_id = lesson_of_student.student.id
-                student_price_info = {
-                    'student_id': student_id,
-                    'name': name,
-                    'price': price,
-                    'hour': hour,
-                }
-                student_info_list = temp.get(student_id)
-                if not student_info_list:
-                    student_info_list = []
-                student_info_list
+    def student_price(self, request):
+        pass
 
     def get_hour(self, price_info):
         """计算课时"""

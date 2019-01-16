@@ -66,6 +66,27 @@ class ScheduleLessonInfo(models.Model):
     start = models.DateTimeField(verbose_name='开始时间')
     end = models.DateTimeField(verbose_name='结束时间')
 
+    def get_lesson(self):
+        return self.lesson_of_teacher.lesson
+
+    def get_student(self):
+        lesson = self.lesson_of_teacher.lesson
+        lesson_of_student = LessonOfStudent.objects.filter(lesson=lesson)
+        student_list = []
+        for los in lesson_of_student:
+            student_list.append(los.student)
+        return student_list
+
+    def get_teacher_price(self):
+        lesson = self.get_lesson()
+        teacher = self.lesson_of_teacher.teacher
+        lesson_of_teacher = LessonOfTeacher.objects.filter(teacher=teacher, lesson=lesson)
+        return lesson_of_teacher.price
+
+    def get_student_price_dict(self):
+        lesson = self.get_lesson()
+        lesson_of_student = LessonOfStudent.objects.filter(lesson=lesson)
+
     class Meta:
         verbose_name = '排课表'
         verbose_name_plural = verbose_name
