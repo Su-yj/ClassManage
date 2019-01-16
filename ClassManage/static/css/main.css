@@ -10,16 +10,20 @@
     background-color: #fff;
 }
 
-thead{
+.table-bordered thead{
     border: 2px solid #000;
 }
 
-tbody{
+.table-bordered tbody{
     border: 2px solid #000;
 }
 
-.table-bordered tbody tr td, .table-bordered thead tr th, .table-bordered tbody tr th{
+.table-responsive .table-bordered tbody tr td, .table-responsive .table-bordered thead tr th, .table-responsive .table-bordered tbody tr th{
     border: 1px solid #000;
+}
+
+.table tbody tr.info td{
+    background-color: #efefef;
 }
 
 .table th, .table td { 

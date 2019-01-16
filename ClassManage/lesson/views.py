@@ -469,19 +469,41 @@ class ScheduleView(View):
     """课表"""
     def get(self, request):
         date = request.GET.get('date')
+        teacher_id = request.GET.get('teacher')
+        student_id = request.GET.get('student')
+        if teacher_id:
+            try:
+                teacher_id = int(teacher_id)
+            except:
+                return JsonResponse(errmsg.PARAMETER_ERROR)
+            teacher = TeacherInfo.objects.filter(pk=teacher_id)
+            if not teacher:
+                return JsonResponse(errmsg.PARAMETER_ERROR)
+        if student_id:
+            try:
+                student_id = int(student_id)
+            except:
+                return JsonResponse(errmsg.NO_SUCH_DATA)
+            student = StudentInfo.objects.filter(pk=student_id)
+            if not student:
+                return JsonResponse(errmsg.NO_SUCH_DATA)
+            lesson_of_student_ids = LessonOfStudent.objects.filter(student__id=student_id).values_list('lesson', flat=True)
         if not date:
             # 今天日期
             now = datetime.date.today()
         else:
             now = datetime.datetime.strptime(date, '%Y-%m-%d').date()
-        # 所有的课程
-        lesson_of_teacher_list = LessonOfTeacher.objects.all()
+        # 查询课程
         lesson_info_list = []
         for i in range(2):
             # 获取本周第一天日期
             this_week_start = now - datetime.timedelta(days=now.weekday() - 7*i)
             # 本周的所有课程
             schedule = ScheduleLessonInfo.objects.filter(start__gte=this_week_start, start__lt=this_week_start+datetime.timedelta(days=7)).order_by('start', 'end')
+            if teacher_id:
+                schedule = schedule.filter(lesson_of_teacher__teacher__id=teacher_id)
+            if student_id:
+                schedule = schedule.filter(lesson_of_teacher__lesson__id__in=lesson_of_student_ids)
             date_list = []
             morning_list = []
             afternoon_list = []
@@ -507,12 +529,18 @@ class ScheduleView(View):
             }
             lesson_info_list.append(lesson_info)
 
+        lesson_of_teacher_list = LessonOfTeacher.objects.all()
+        teacher_list = TeacherInfo.objects.all()
+        student_list = StudentInfo.objects.all()
+
         context = {
             'title': '课表',
             'modal_title': '课程安排',
             'add_button': '添加课程',
             'lesson_of_teacher_list': lesson_of_teacher_list,
             'lesson_info_list': lesson_info_list,
+            'student_list': student_list,
+            'teacher_list': teacher_list,
         }
         return render(request, 'lesson/schedule.html', context)
 

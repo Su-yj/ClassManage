@@ -1,6 +1,29 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{ title }}</title>
+    <!-- <script type="text/javascript" src="js/set_root.js"></script> -->
+    <!-- <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script> -->
+    <!-- jquery -->
+    <script src="/static/js/jquery.min.js"></script>
+    <!-- bootstrap js -->
+    <script src="/static/js/bootstrap.min.js"></script>
+    <!-- bootstrap css -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="/static/css/reset.css"> -->
+    <link rel="stylesheet" href="/static/css/main.css">
+    <!--validate验证表单插件-->
+    <script src="/static/js/jquery-1.11.1.js"></script>
+    <script src="/static/js/jquery.validate.min.js"></script>
+    <script src="/static/js/messages_zh.js"></script>
+    <link rel="stylesheet" href="/static/css/validation.css">
+    <!-- <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/lib/jquery.js"></script>
+    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
+    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/localization/messages_zh.js"></script> -->
 
-{% block head %}
     <!-- datetimepicker时间插件 -->
     <script src="/static/js/bootstrap-datetimepicker.min.js"></script>
     <script src="/static/js/bootstrap-datetimepicker.zh-CN.js"></script>
@@ -53,296 +76,483 @@
             });   
         });
     </script>
-{% endblock head %}
+    <script>
+        // 添加validation验证方法
+        $.validator.addMethod("isDatetime",function(value,element){
+            var score =  /^[0-9]{4}-[0-1]?[0-9]{1}-[0-3]?[0-9]{1} (0\d{1}|1\d{1}|2[0-3]):([0-5]\d{1})$/;
+            return this.optional(element) || (score.test(value));
+        },"<font>请输入正确的时间格式 (2018-01-01 08:00)</font>");
 
-{% block script %}
-    // 添加validation验证方法
-    $.validator.addMethod("isDatetime",function(value,element){
-        var score =  /^[0-9]{4}-[0-1]?[0-9]{1}-[0-3]?[0-9]{1} (0\d{1}|1\d{1}|2[0-3]):([0-5]\d{1})$/;
-        return this.optional(element) || (score.test(value));
-    },"<font>请输入正确的时间格式 (2018-01-01 08:00)</font>");
+        //定义一个变量用于存储添加和修改时不同的URL
+        var myUrl = '/lesson/schedule/info/';
 
-    //定义一个变量用于存储添加和修改时不同的URL
-    var myUrl = '/lesson/schedule/info/';
+        // 点击update,并传入id
+        function update(id) {
+            initForm();
+            if(!id){
+                alert('id错误');
+                return false;
+            }
+            $('.delete').show();
 
-    // 点击update,并传入id
-    function update(id) {
-        initForm();
-        if(!id){
-            alert('id错误');
-            return false;
+            $.ajax({
+                url: myUrl,
+                data: {'id': id},
+                type: 'get',
+                dataType: 'json',
+                //解决编码问题
+                // scriptCharset: 'utf-8',
+                // contentType: "application/json; charset=utf-8",
+                beforeSend: function () {
+                    return true;
+                },
+                success: function (data) {
+                    if(data.code==0) {
+                        data = data.data;
+                        console.log(data);
+                        //赋值
+                        $('#id').val(data.id);
+                        $('#lesson_of_teacher').val(data.lesson_of_teacher);
+                        $('#start').val(data.start);
+                        $('#end').val(data.end);
+                        $('.delete').attr('onclick', 'delete_one('+data.id+');');
+                    }
+                    else{
+                        alert(data.message);
+                    }
+                }
+            })
         }
-        $('.delete').show();
 
-        $.ajax({
-            url: myUrl,
-            data: {'id': id},
-            type: 'get',
-            dataType: 'json',
-            //解决编码问题
-            // scriptCharset: 'utf-8',
-            // contentType: "application/json; charset=utf-8",
-            beforeSend: function () {
-                return true;
-            },
-            success: function (data) {
-                if(data.code==0) {
-                    data = data.data;
-                    console.log(data);
-                    //赋值
-                    $('#id').val(data.id);
-                    $('#lesson_of_teacher').val(data.lesson_of_teacher);
-                    $('#start').val(data.start);
-                    $('#end').val(data.end);
-                    $('.delete').attr('onclick', 'delete_one('+data.id+');');
+        //表单字段验证
+        //如果按照一般验证的写法，只能调用整个表单的validate函数，而不能调用自定义的user_name验证，所以把两个函数封装成为一个，在点击按钮时调用
+        function vali() {
+            //form-data表单验证。
+            $("#form-data").validate({
+                onfocusout:function(element) { $(element).valid(); },
+                onblur: function(element) { $(element).valid(); },    //鼠标移开验证。这里写onblue:true没有效果
+                onsubmit:true,      //提交时验证（有效）
+                onkeyup:false,
+                rules:{
+                    lesson_of_teacher:{
+                        required:true,
+                    },
+                    start:{
+                        required:true,
+                        isDatetime:true,
+                    },
+                    end:{
+                        required:true,
+                        isDatetime:true,
+                    }
+                },
+                messages:{
+                    lesson_of_teacher:{
+                        required:"请选择老师",
+                    },
+                    start:{
+                        required:"请选择开始时间",
+                    },
+                    end:{
+                        required:"请选择结束时间",
+                    }
+                },
+                submitHandler:function (form) {
+                    checkForm();
                 }
-                else{
-                    alert(data.message);
-                }
+            });
+        }
+
+        // 初始化模态框
+        function initForm() {
+            $('#tip').empty();
+            $('#id').val('');
+            $('#lesson_of_teacher option:first').prop('selected', true);
+            $('#start').val('');
+            $('#end').val('');
+            $('.delete').hide();
+        };
+
+        /*
+        点击添加用户时需要做的操作：
+            1.修改提交表单的URL
+            2.将user_name的readonly属性移除
+            3.清空表单数据
+            */
+        function setUrl() {
+            initForm();
+        }
+
+        /* 获取url参数 */
+        function getUrlParam(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+            var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+            if (r != null) return unescape(r[2]); return null; //返回参数值
+        }
+
+        /* 获取当前日期 */
+        function getFormatDate(date, n){
+            var date = date;
+            var year,month,day ;
+            date.setDate(date.getDate()+n*7);
+            year = date.getFullYear();
+            month = date.getMonth()+1;
+            day = date.getDate() ;
+            s = year + '-' + ( month < 10 ? ( '0' + month ) : month ) + '-' + ( day < 10 ? ( '0' + day ) : day) ;
+            return s ;
+        }
+
+        function week(num) {
+            var strDate = getUrlParam('date');
+            var teacher = getUrlParam('teacher');
+            var student = getUrlParam('student');
+            if(strDate==null){
+                date = new Date();
+            }
+            else{
+                date = new Date(Date.parse(strDate));
+            }
+            date = getFormatDate(date, num);
+            var params = '?date=' + date;
+            if(teacher!=null){
+                params += '&teacher=' + teacher;
+            }
+            if(student!=null){
+                params += '&student=' + student;
+            }
+            url = location.pathname + params;
+            window.location.href = url;
+        }
+
+        function checkForm() {
+
+            var obj = {};
+
+            obj['type'] = 'add';
+            obj['lesson_of_teacher'] = parseInt($('#lesson_of_teacher').val());
+            obj['start'] = $('#start').val();
+            obj['end'] = $('#end').val();
+
+            if ($('#id').val().length!=0) {
+                console.log($('#id').val());
+                obj['id'] = parseInt($('#id').val());
+                obj['type'] = 'edit';
+            }
+
+            console.log(JSON.stringify(obj));
+            $.ajax({
+                    url: myUrl,      //根据操作传入不同的URL
+                    type:"post",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(obj),
+                    dataType:'json',
+                    timeout:50000,
+                    beforeSend:function () {
+                        $('#tip').html('<span style="color: cornflowerblue">正在处理...</span>');
+                        return true;
+                    },
+                    success:function (data) {
+                        if(data.code==0){
+                            $('#tip').html('<span style="color: green">操作成功！</span>');
+                            location.reload(true);
+                        }
+                        else{
+                            alert(data.message);
+                            $('#tip').html('<span style="color: red">操作失败，请重试</span>');
+                        }
+                    },
+                    error:function(XMLHttpRequest, textStatus, errorThrown) {
+                        // alert(XMLHttpRequest.status);//状态码
+                        // alert(XMLHttpRequest.readyState);//状态
+                        // alert(textStatus);//错误信息
+                        alert("出错了");
+
+                    },
+                    complete:function () {
+
+                    }
+            });
+        }
+
+        function delete_one(id) {
+            if(confirm('确定删除吗?')) {
+                var data = {}
+                data['type'] = 'delete';
+                data['id'] = id;
+                $.ajax({
+                    url: myUrl,
+                    data: JSON.stringify(data),
+                    type: 'post',
+                    dataType: 'json',
+                    //解决编码问题
+                    // scriptCharset: 'utf-8',
+                    // contentType: "application/json; charset=utf-8",
+                    beforeSend: function () {
+                        return true;
+                    },
+                    success: function (data) {
+                        if(data.code==0) {
+                            console.log(data);
+                            location.reload(true);
+                        }
+                        else{
+                            alert(data.message);
+                        }
+                    },
+                    error: function() {
+                        alert('出错了');
+                    }
+                })
+            }
+        }
+
+        function filter(){
+            var teacher = $('#filter_teacher').val();
+            var student = $('#filter_student').val();
+            var date = getUrlParam('date');
+            var params = "?";
+            if(date!=null){
+                params += "date=" + date + "&";
+            }
+            if(teacher!=""){
+                params += "teacher=" + teacher + "&";
+            }
+            if(student!=""){
+                params += "student=" + student + "&";
+            }
+            url = location.pathname + params;
+            window.location.href = url;
+        }
+
+        $(function(){
+            var teacher = getUrlParam('teacher');
+            var student = getUrlParam('student');
+
+            if(teacher!=null){
+                $('#filter_teacher').val(teacher);
+            }
+            if(student!=null){
+                $('#filter_student').val(student);
             }
         })
-    }
 
-    //表单字段验证
-    //如果按照一般验证的写法，只能调用整个表单的validate函数，而不能调用自定义的user_name验证，所以把两个函数封装成为一个，在点击按钮时调用
-    function vali() {
-        //form-data表单验证。
-        $("#form-data").validate({
-            onfocusout:function(element) { $(element).valid(); },
-            onblur: function(element) { $(element).valid(); },    //鼠标移开验证。这里写onblue:true没有效果
-            onsubmit:true,      //提交时验证（有效）
-            onkeyup:false,
-            rules:{
-                lesson_of_teacher:{
-                    required:true,
-                },
-                start:{
-                    required:true,
-                    isDatetime:true,
-                },
-                end:{
-                    required:true,
-                    isDatetime:true,
-                }
-            },
-            messages:{
-                lesson_of_teacher:{
-                    required:"请选择老师",
-                },
-                start:{
-                    required:"请选择开始时间",
-                },
-                end:{
-                    required:"请选择结束时间",
-                }
-            },
-            submitHandler:function (form) {
-                checkForm();
-            }
-        });
-    }
+    </script>
 
-    // 初始化模态框
-    function initForm() {
-        $('#tip').empty();
-        $('#id').val('');
-        $('#lesson_of_teacher option:first').prop('selected', true);
-        $('#start').val('');
-        $('#end').val('');
-        $('.delete').hide();
-    };
-
-    /*
-    点击添加用户时需要做的操作：
-        1.修改提交表单的URL
-        2.将user_name的readonly属性移除
-        3.清空表单数据
-        */
-    function setUrl() {
-        initForm();
-    }
-
-    /* 获取url参数 */
-    function getUrlParam(name) {
-        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
-        var r = window.location.search.substr(1).match(reg);  //匹配目标参数
-        if (r != null) return unescape(r[2]); return null; //返回参数值
-    }
-
-    /* 获取当前日期 */
-    function getFormatDate(date, n){
-        var date = date;
-        var year,month,day ;
-        date.setDate(date.getDate()+n*7);
-        year = date.getFullYear();
-        month = date.getMonth()+1;
-        day = date.getDate() ;
-        s = year + '-' + ( month < 10 ? ( '0' + month ) : month ) + '-' + ( day < 10 ? ( '0' + day ) : day) ;
-        return s ;
-    }
-
-    function week(num) {
-        var strDate = getUrlParam('date');
-        if(strDate==null){
-            date = new Date();
-        }
-        else{
-            date = new Date(Date.parse(strDate));
-        }
-        date = getFormatDate(date, num);
-        url = location.pathname + '?date=' + date;
-        window.location.href = url;
-    }
-
-{% endblock script %}
-
-{% block checkForm %}
-    var obj = {};
-
-    obj['type'] = 'add';
-    obj['lesson_of_teacher'] = parseInt($('#lesson_of_teacher').val());
-    obj['start'] = $('#start').val();
-    obj['end'] = $('#end').val();
-
-    if ($('#id').val().length!=0) {
-        console.log($('#id').val());
-        obj['id'] = parseInt($('#id').val());
-        obj['type'] = 'edit';
-    }
-{% endblock checkForm %}
-
-{% block navbar %}
-    <li class="active"><a href="/lesson/schedule/">课表</a></li>
-    <li><a href="/lesson/student/">学生课程管理</a></li>
-    <li><a href="/lesson/teacher/">老师课程管理</a></li>
-    <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-            其他 <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-            <li><a href="/student/">学生管理</a></li>
-            <li><a href="/teacher/">老师管理</a></li>
-            <li><a href="/lesson/">课程种类</a></li>
-        </ul>
-    </li>
-{% endblock navbar %}
-
-{% block search %}
-<button type="button" class="btn btn-info" onclick="week(-1)">上一周</button>
-<button type="button" class="btn btn-info" onclick="week(1)">下一周</button>
-{% endblock search %}
-
-{% block modal_form %}
-    <form action="" class="form-horizontal">
-        <!--user_id为隐藏的input，便于update时的传值-->
-        <input type="text" id="id" name="id" hidden>
-        <div class="form-group">
-            <label for="lesson_of_teacher" class="col-sm-3 control-label mark_location">
-                课程
-                <span class="star">*</span>
-            </label>
-            <div class="col-sm-9">
-                <select class="form-control" id="lesson_of_teacher" name="lesson_of_teacher">
-                    <option value="">请选择课程</option>
-                    {% for lesson_of_teacher in lesson_of_teacher_list %}
-                        <option value="{{ lesson_of_teacher.id }}">{{ lesson_of_teacher }}</option>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-default navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">切换导航</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">课程管理系统</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="/lesson/schedule/">课表</a></li>
+                    <li><a href="/lesson/student/">学生课程管理</a></li>
+                    <li><a href="/lesson/teacher/">老师课程管理</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            其他 <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/student/">学生管理</a></li>
+                            <li><a href="/teacher/">老师管理</a></li>
+                            <li><a href="/lesson/">课程种类</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="jumbotron">
+        <div class="container">
+            <!-- Large modal -->
+            <!--<p class="text-left">-->
+                <!--<button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="prev()">上一周</button>-->
+            <!--</p>-->
+            <!--<p class="text-right"><button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">{{ add_button }}</button></p>-->
+            <div class="row">
+                <div class="col-xs-12 col-sm-3 col-md-3">
+                    <button type="button" class="btn btn-info" onclick="week(-1)">上一周</button>
+                    <button type="button" class="btn btn-info" onclick="week(1)">下一周</button>
+                </div>
+                <div class="col-xs-12 col-sm-7 col-md-7">
+                    <div class="col-xs-5 col-sm-5 col-md-5">
+                        <select class="form-control" id="filter_teacher" name="filter_teacher">
+                            <option value="">选择老师</option>
+                            {% for teacher in teacher_list %}
+                                <option value="{{ teacher.id }}">{{ teacher }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-xs-5 col-sm-5 col-md-5">
+                        <select class="form-control" id="filter_student" name="filter_student">
+                            <option value="">选择学生</option>
+                            {% for student in student_list %}
+                                <option value="{{ student.id }}">{{ student }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-xs-2 col-sm-2 col-md-2">
+                        <button type="button" class="btn btn-default" onclick="filter()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                    </div>
+                </div>
+                <div class="col-xs-1 col-sm-2 col-md-2">
+                    <p class="text-right"><button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">{{ add_button }}</button></p>
+                </div>
+                <!--<div class="col-md-10">-->
+                    <!--<button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="prev()">上一周</button>-->
+                <!--</div>-->
+                <!--<div class="col-md-2">-->
+                    <!--<button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">{{ add_button }}</button>-->
+                    <!--<p class="text-right"><button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">{{ add_button }}</button></p>-->
+                <!--</div>-->
+            </div>
+            <!--模态框-->
+            <form method="post" name="user" class="form-horizontal" role="form" id="form-data"  style="margin: 20px;" >
+                <div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    ×
+                                </button>
+                                <h4 class="modal-title" id="updateModalLabel">
+                                    {{ modal_title }}
+                                </h4>
+                            </div>
+                            <div class="modal-body">
+                                <form action="" class="form-horizontal">
+                                    <!--user_id为隐藏的input，便于update时的传值-->
+                                    <input type="text" id="id" name="id" hidden>
+                                    <div class="form-group">
+                                        <label for="lesson_of_teacher" class="col-sm-3 control-label mark_location">
+                                            课程
+                                            <span class="star">*</span>
+                                        </label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" id="lesson_of_teacher" name="lesson_of_teacher">
+                                                <option value="">请选择课程</option>
+                                                {% for lesson_of_teacher in lesson_of_teacher_list %}
+                                                    <option value="{{ lesson_of_teacher.id }}">{{ lesson_of_teacher }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="start" class="col-sm-3 control-label mark_location">
+                                            开始时间
+                                            <span class="star">*</span>
+                                        </label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" placeholder="开始时间" id="start" name="start" autocomplete='off'>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="end" class="col-sm-3 control-label mark_location">
+                                            结束时间
+                                            <span class="star">*</span>
+                                        </label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" placeholder="结束时间" id="end" name="end" autocomplete='off'>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                <!--type为submit时，会自动调用该表单的验证，但是不会调用自己定义的动态的user_name的验证，
+                                所以把按钮类型改为input，再手动调用封装好的验证函数-->
+                                <button type="button" class="btn btn-danger delete">删除</button>
+                                <button type="input" class="btn btn-primary" onclick="vali();">提交</button>
+                                <span id="tip"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <!-- 表格 -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    {% for lesson_info in lesson_info_list %}
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            {% for date in lesson_info.date_list %}
+                                <th>{{ date }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">上午</th>
+                            {% for morning in lesson_info.morning %}
+                            <td class="text-muted">
+                                {% for lesson in morning %}
+                                <div class="lesson">
+                                    <div data-toggle="modal" data-target="#updateModal" onclick="update({{ lesson.id }})">
+                                        <div class="lesson_info">{{ lesson.lesson_of_teacher }}</div>
+                                        <div class="start_time">{{ lesson.start|date:'m-d H:i' }}</div>
+                                        <div class="end_time">{{ lesson.end|date:'m-d H:i' }}</div>
+                                    </div>
+                                    <!--<div>-->
+                                        <!--<button type="button" class="btn btn-danger btn-xs" onclick="delete_one({{ lesson.id }})">删除</button>-->
+                                    <!--</div>-->
+                                </div>
+                                {% endfor %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <th scope="row">下午</th>
+                            {% for afternoon in lesson_info.afternoon %}
+                            <td class="text-muted">
+                                {% for lesson in afternoon %}
+                                <div class="lesson">
+                                    <div data-toggle="modal" data-target="#updateModal" onclick="update({{ lesson.id }})">
+                                        <div class="lesson_info">{{ lesson.lesson_of_teacher }}</div>
+                                        <div class="start_time">{{ lesson.start|date:'m-d H:i' }}</div>
+                                        <div class="end_time">{{ lesson.end|date:'m-d H:i' }}</div>
+                                    </div>
+                                    <!--<div>-->
+                                        <!--<button type="button" class="btn btn-danger btn-xs" onclick="delete_one({{ lesson.id }})">删除</button>-->
+                                    <!--</div>-->
+                                </div>
+                                {% endfor %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <th scope="row">晚上</th>
+                            {% for night in lesson_info.night %}
+                            <td class="text-muted">
+                                {% for lesson in night %}
+                                <div class="lesson">
+                                    <div data-toggle="modal" data-target="#updateModal" onclick="update({{ lesson.id }})">
+                                        <div class="lesson_info">{{ lesson.lesson_of_teacher }}</div>
+                                        <div class="start_time">{{ lesson.start|date:'m-d H:i' }}</div>
+                                        <div class="end_time">{{ lesson.end|date:'m-d H:i' }}</div>
+                                    </div>
+                                    <!--<div>-->
+                                        <!--<button type="button" class="btn btn-danger btn-xs" onclick="delete_one({{ lesson.id }})">删除</button>-->
+                                    <!--</div>-->
+                                </div>
+                                {% endfor %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
                     {% endfor %}
-                </select>
+                </table>
             </div>
         </div>
-        <div class="form-group">
-            <label for="start" class="col-sm-3 control-label mark_location">
-                开始时间
-                <span class="star">*</span>
-            </label>
-            <div class="col-sm-9">
-                <input type="text" class="form-control" placeholder="开始时间" id="start" name="start" autocomplete='off'>
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="end" class="col-sm-3 control-label mark_location">
-                结束时间
-                <span class="star">*</span>
-            </label>
-            <div class="col-sm-9">
-                <input type="text" class="form-control" placeholder="结束时间" id="end" name="end" autocomplete='off'>
-            </div>
-        </div>
-    </form>
-{% endblock modal_form %}
-
-{% block delete_btn %}
-    <button type="button" class="btn btn-danger delete">删除</button>
-{% endblock delete_btn %}
-
-{% block table %}
-    {% for lesson_info in lesson_info_list %}
-    <thead>
-        <tr>
-            <th>时间</th>
-            {% for date in lesson_info.date_list %}
-                <th>{{ date }}</th>
-            {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <th scope="row">上午</th>
-            {% for morning in lesson_info.morning %}
-            <td class="text-muted">
-                {% for lesson in morning %}
-                <div class="lesson">
-                    <div data-toggle="modal" data-target="#updateModal" onclick="update({{ lesson.id }})">
-                        <div class="lesson_info">{{ lesson.lesson_of_teacher }}</div>
-                        <div class="start_time">{{ lesson.start|date:'m-d H:i' }}</div>
-                        <div class="end_time">{{ lesson.end|date:'m-d H:i' }}</div>
-                    </div>
-                    <!--<div>-->
-                        <!--<button type="button" class="btn btn-danger btn-xs" onclick="delete_one({{ lesson.id }})">删除</button>-->
-                    <!--</div>-->
-                </div>
-                {% endfor %}
-            </td>
-            {% endfor %}
-        </tr>
-        <tr>
-            <th scope="row">下午</th>
-            {% for afternoon in lesson_info.afternoon %}
-            <td class="text-muted">
-                {% for lesson in afternoon %}
-                <div class="lesson">
-                    <div data-toggle="modal" data-target="#updateModal" onclick="update({{ lesson.id }})">
-                        <div class="lesson_info">{{ lesson.lesson_of_teacher }}</div>
-                        <div class="start_time">{{ lesson.start|date:'m-d H:i' }}</div>
-                        <div class="end_time">{{ lesson.end|date:'m-d H:i' }}</div>
-                    </div>
-                    <!--<div>-->
-                        <!--<button type="button" class="btn btn-danger btn-xs" onclick="delete_one({{ lesson.id }})">删除</button>-->
-                    <!--</div>-->
-                </div>
-                {% endfor %}
-            </td>
-            {% endfor %}
-        </tr>
-        <tr>
-            <th scope="row">晚上</th>
-            {% for night in lesson_info.night %}
-            <td class="text-muted">
-                {% for lesson in night %}
-                <div class="lesson">
-                    <div data-toggle="modal" data-target="#updateModal" onclick="update({{ lesson.id }})">
-                        <div class="lesson_info">{{ lesson.lesson_of_teacher }}</div>
-                        <div class="start_time">{{ lesson.start|date:'m-d H:i' }}</div>
-                        <div class="end_time">{{ lesson.end|date:'m-d H:i' }}</div>
-                    </div>
-                    <!--<div>-->
-                        <!--<button type="button" class="btn btn-danger btn-xs" onclick="delete_one({{ lesson.id }})">删除</button>-->
-                    <!--</div>-->
-                </div>
-                {% endfor %}
-            </td>
-            {% endfor %}
-        </tr>
-    </tbody>
-    {% endfor %}
-{% endblock table %}
+    </div>
+</body>
+</html>
