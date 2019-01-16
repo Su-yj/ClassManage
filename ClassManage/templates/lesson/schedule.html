@@ -306,6 +306,7 @@
             }
         }
 
+        /* 筛选器 */
         function filter(){
             var teacher = $('#filter_teacher').val();
             var student = $('#filter_student').val();
@@ -324,6 +325,18 @@
             window.location.href = url;
         }
 
+        /* 样式激活 */
+        function active(){
+            var pathname = window.location.pathname;
+            console.log(pathname);
+            $('.nav').find('a').each(function(){
+                if($(this).attr('href')==pathname){
+                    $(this).parent().addClass('active');
+                    return;
+                }
+            })
+        }
+
         $(function(){
             var teacher = getUrlParam('teacher');
             var student = getUrlParam('student');
@@ -334,6 +347,7 @@
             if(student!=null){
                 $('#filter_student').val(student);
             }
+            active();
         })
 
     </script>
@@ -365,9 +379,18 @@
                             <li><a href="/student/">学生管理</a></li>
                             <li><a href="/teacher/">老师管理</a></li>
                             <li><a href="/lesson/">课程种类</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li class="dropdown-header">价格统计</li>
+                            <li><a href="/price/student/">学生价格统计</a></li>
+                            <li><a href="/price/teacher/">老师价格统计</a></li>
                         </ul>
                     </li>
                 </ul>
+                <!-- <ul class="nav navbar-nav navbar-right">
+                    <li><a href="../navbar/">Default</a></li>
+                    <li class="active"><a href="./">Static top <span class="sr-only">(current)</span></a></li>
+                    <li><a href="../navbar-fixed-top/">Fixed top</a></li>
+                </ul> -->
             </div>
         </div>
     </nav>

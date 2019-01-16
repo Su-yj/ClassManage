@@ -6,6 +6,8 @@ from django.shortcuts import render
 from django.views import View
 from django.http import JsonResponse, HttpResponse
 from .models import *
+from price.models import PriceInfo
+from dateutil.relativedelta import relativedelta
 from student.models import StudentInfo
 from teacher.models import TeacherInfo
 
@@ -59,7 +61,6 @@ class SubjectInfoView(View):
     def post(self, request):
         # 处理接收的数据
         data = parse_json(request)
-        print(data)
         if not data:
             return JsonResponse(errmsg.PARAMETER_TYPE_ERROR)
         # 处理的方法
@@ -179,7 +180,6 @@ class StudentLessonInfoView(View):
     def post(self, request):
         # 处理接收的数据
         data = parse_json(request)
-        print(data)
         if not data:
             return JsonResponse(errmsg.PARAMETER_TYPE_ERROR)
         # 处理的方法
@@ -357,7 +357,6 @@ class TeacherLessonInfoView(View):
     def post(self, request):
         # 处理接收的数据
         data = parse_json(request)
-        print(data)
         if not data:
             return JsonResponse(errmsg.PARAMETER_TYPE_ERROR)
         # 处理的方法
@@ -587,7 +586,6 @@ class ScheduleInfoView(View):
     def post(self, request):
         # 处理接收的数据
         data = parse_json(request)
-        print(data)
         if not data:
             return JsonResponse(errmsg.PARAMETER_TYPE_ERROR)
         # 处理的方法
@@ -620,7 +618,13 @@ class ScheduleInfoView(View):
         except:
             return JsonResponse(errmsg.PARAMETER_ERROR)
 
-        ScheduleLessonInfo(lesson_of_teacher=lesson_of_teacher, start=start_time, end=end_time).save()
+        schedule = ScheduleLessonInfo(lesson_of_teacher=lesson_of_teacher, start=start_time, end=end_time)
+        schedule.save()
+        # 添加价格
+        lesson = lesson_of_teacher.lesson
+        students = StudentInfo.objects.filter(lesson=lesson)
+        for student in students:
+            PriceInfo(student=student, teacher=lesson_of_teacher.teacher, schedule=schedule).save()
         return JsonResponse(errmsg.SUCCESS)
 
     def edit(self, data):
@@ -650,12 +654,18 @@ class ScheduleInfoView(View):
         schedule.start = start_time
         schedule.end = end_time
         schedule.save()
+        # 添加价格
+        price_info_list = PriceInfo.objects.filter(schedule=schedule)
+        for price_info in price_info_list:
+            price_info.delete()
+        lesson = lesson_of_teacher.lesson
+        students = StudentInfo.objects.filter(lesson=lesson)
+        for student in students:
+            PriceInfo(student=student, teacher=lesson_of_teacher.teacher, schedule=schedule).save()
         return JsonResponse(errmsg.SUCCESS)
 
     def delete(self, data):
         _id = data.get('id')
-        print('----------------------')
-        print(data)
         if not _id:
             return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
 

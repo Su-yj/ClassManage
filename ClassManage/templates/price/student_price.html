@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{ title }}</title>
+    <!-- <script type="text/javascript" src="js/set_root.js"></script> -->
+    <!-- <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script> -->
+    <!-- jquery -->
+    <script src="/static/js/jquery.min.js"></script>
+    <!-- bootstrap js -->
+    <script src="/static/js/bootstrap.min.js"></script>
+    <!-- bootstrap css -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="/static/css/reset.css"> -->
+    <link rel="stylesheet" href="/static/css/main.css">
+    <!--validate验证表单插件-->
+    <script src="/static/js/jquery-1.11.1.js"></script>
+    <script src="/static/js/jquery.validate.min.js"></script>
+    <script src="/static/js/messages_zh.js"></script>
+    <link rel="stylesheet" href="/static/css/validation.css">
+    <!-- <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/lib/jquery.js"></script>
+    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
+    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/localization/messages_zh.js"></script> -->
+
+    <!-- datetimepicker时间插件 -->
+    <script src="/static/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="/static/js/bootstrap-datetimepicker.zh-CN.js"></script>
+    <link rel="stylesheet" href="/static/css/bootstrap-datetimepicker.min.css">
+    <!-- 时间选择器 -->
+    <script>
+        $(function(){
+            $("#select_month").datetimepicker({
+                format: 'yyyy-mm',
+                weekStart: 1,
+                autoclose: true,
+                startView: 3,
+                minView: 3,
+                forceParse: false,
+                language: 'zh-CN'
+            });
+        });
+    </script>
+    <script>
+        //定义一个变量用于存储添加和修改时不同的URL
+        var myUrl = '/price/student/';
+
+        //表单字段验证
+        //如果按照一般验证的写法，只能调用整个表单的validate函数，而不能调用自定义的user_name验证，所以把两个函数封装成为一个，在点击按钮时调用
+        function vali() {
+            //form-data表单验证。
+            $("#form-data").validate({
+                onfocusout:function(element) { $(element).valid(); },
+                onblur: function(element) { $(element).valid(); },    //鼠标移开验证。这里写onblue:true没有效果
+                onsubmit:true,      //提交时验证（有效）
+                onkeyup:false,
+                rules:{
+                    lesson_of_teacher:{
+                        required:true,
+                    },
+                    start:{
+                        required:true,
+                        isDatetime:true,
+                    },
+                    end:{
+                        required:true,
+                        isDatetime:true,
+                    }
+                },
+                messages:{
+                    lesson_of_teacher:{
+                        required:"请选择老师",
+                    },
+                    start:{
+                        required:"请选择开始时间",
+                    },
+                    end:{
+                        required:"请选择结束时间",
+                    }
+                },
+                submitHandler:function (form) {
+                    checkForm();
+                }
+            });
+        }
+
+        // 初始化模态框
+        function initForm() {
+            $('#tip').empty();
+            $('#id').val('');
+            $('#lesson_of_teacher option:first').prop('selected', true);
+            $('#start').val('');
+            $('#end').val('');
+            $('.delete').hide();
+        };
+
+        /*
+        点击添加用户时需要做的操作：
+            1.修改提交表单的URL
+            2.将user_name的readonly属性移除
+            3.清空表单数据
+            */
+        function setUrl() {
+            initForm();
+        }
+
+        /* 获取url参数 */
+        function getUrlParam(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+            var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+            if (r != null) return unescape(r[2]); return null; //返回参数值
+        }
+
+        /* 获取当前日期 */
+        function getFormatDate(date, n){
+            var date = date;
+            var year,month,day ;
+            date.setDate(date.getDate()+n*7);
+            year = date.getFullYear();
+            month = date.getMonth()+1;
+            day = date.getDate() ;
+            s = year + '-' + ( month < 10 ? ( '0' + month ) : month ) + '-' + ( day < 10 ? ( '0' + day ) : day) ;
+            return s ;
+        }
+
+        function month(num) {
+            var strDate = getUrlParam('date');
+            if(strDate==null){
+                date = new Date();
+            }
+            else{
+                date = new Date(Date.parse(strDate));
+            }
+            date = getFormatDate(date, num);
+            var params = '?date=' + date;
+            url = location.pathname + params;
+            window.location.href = url;
+        }
+
+        function checkForm() {
+
+            var obj = {};
+
+            obj['type'] = 'add';
+            obj['lesson_of_teacher'] = parseInt($('#lesson_of_teacher').val());
+            obj['start'] = $('#start').val();
+            obj['end'] = $('#end').val();
+
+            if ($('#id').val().length!=0) {
+                console.log($('#id').val());
+                obj['id'] = parseInt($('#id').val());
+                obj['type'] = 'edit';
+            }
+
+            console.log(JSON.stringify(obj));
+            $.ajax({
+                    url: myUrl,      //根据操作传入不同的URL
+                    type:"post",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(obj),
+                    dataType:'json',
+                    timeout:50000,
+                    beforeSend:function () {
+                        $('#tip').html('<span style="color: cornflowerblue">正在处理...</span>');
+                        return true;
+                    },
+                    success:function (data) {
+                        if(data.code==0){
+                            $('#tip').html('<span style="color: green">操作成功！</span>');
+                            location.reload(true);
+                        }
+                        else{
+                            alert(data.message);
+                            $('#tip').html('<span style="color: red">操作失败，请重试</span>');
+                        }
+                    },
+                    error:function(XMLHttpRequest, textStatus, errorThrown) {
+                        // alert(XMLHttpRequest.status);//状态码
+                        // alert(XMLHttpRequest.readyState);//状态
+                        // alert(textStatus);//错误信息
+                        alert("出错了");
+
+                    },
+                    complete:function () {
+
+                    }
+            });
+        }
+
+        /* 筛选器 */
+        function filter(){
+            var select_month = $('#select_month').val();
+            var params = "?date=" + select_month;
+            url = location.pathname + params;
+            window.location.href = url;
+        }
+
+        /* 样式激活 */
+        function active(){
+            var pathname = window.location.pathname;
+            console.log(pathname);
+            $('.nav').find('a').each(function(){
+                if($(this).attr('href')==pathname){
+                    $(this).parent().addClass('active');
+                    return;
+                }
+            })
+        }
+
+        $(function(){
+            var teacher = getUrlParam('teacher');
+            var student = getUrlParam('student');
+
+            if(teacher!=null){
+                $('#filter_teacher').val(teacher);
+            }
+            if(student!=null){
+                $('#filter_student').val(student);
+            }
+            active();
+        })
+
+    </script>
+
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-default navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">切换导航</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">课程管理系统</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="/lesson/schedule/">课表</a></li>
+                    <li><a href="/lesson/student/">学生课程管理</a></li>
+                    <li><a href="/lesson/teacher/">老师课程管理</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            其他 <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/student/">学生管理</a></li>
+                            <li><a href="/teacher/">老师管理</a></li>
+                            <li><a href="/lesson/">课程种类</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li class="dropdown-header">价格统计</li>
+                            <li><a href="/price/student/">学生价格统计</a></li>
+                            <li><a href="/price/teacher/">老师价格统计</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <!-- <ul class="nav navbar-nav navbar-right">
+                    <li><a href="../navbar/">Default</a></li>
+                    <li class="active"><a href="./">Static top <span class="sr-only">(current)</span></a></li>
+                    <li><a href="../navbar-fixed-top/">Fixed top</a></li>
+                </ul> -->
+            </div>
+        </div>
+    </nav>
+    <div class="jumbotron">
+        <div class="container">
+            <!-- Large modal -->
+            <div class="row">
+                <div class="col-xs-12 col-sm-3 col-md-3">
+                    <button type="button" class="btn btn-info" onclick="month(-1)">上一个月</button>
+                    <button type="button" class="btn btn-info" onclick="month(1)">下一个月</button>
+                </div>
+                <div class="col-xs-12 col-sm-5 col-md-5">
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+                        <input type="text" class="form-control" placeholder="选择月份" id="select_month" name="select_month" autocomplete='off'>
+                    </div>
+                    <div class="col-xs-4 col-sm-4 col-md-4">
+                        <button type="button" class="btn btn-default" onclick="filter()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                    </div>
+                </div>
+            </div>
+            <!-- 表格 -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th hidden>id</th>
+                            <th>学生姓名</th>
+                            <th>总课时</th>
+                            <th>总课时费</th>
+                            <th>查看详情</th>
+                        </tr>
+                    </thead>
+                    <tbody >
+                        {% for student_price in student_price_list %}
+                        <tr class="info">
+                            <td class="id" value="{{ student_price.id }}" hidden>{{ student_price.id }}</td>
+                            <td class="name" value="{{ student_price.name }}">{{ student_price.name }}</td>
+                            <td class="hour" value="{{ student_price.hour }}">{{ student_price.hour }}</td>
+                            <td class="price" value="{{ student_price.price }}">{{ student_price.price }}</td>
+                            <td>
+                                <!--传入当前用户id-->
+                                <a href="?student={{ student_price.id }}">
+                                    <button type="button" class="btn btn-info btn-sm">查看详情</button>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
