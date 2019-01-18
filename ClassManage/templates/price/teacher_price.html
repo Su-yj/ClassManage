@@ -44,7 +44,7 @@
     </script>
     <script>
         //定义一个变量用于存储添加和修改时不同的URL
-        var myUrl = '/price/student/';
+        var myUrl = '/price/teacher/';
 
         /* 获取url参数 */
         function getUrlParam(name) {
@@ -115,7 +115,7 @@
 
         /* 点击详细 */
         function detail(id){
-            var params = '?student=' + id;
+            var params = '?teacher=' + id;
             var date = getUrlParam('date');
             if(date!=null){
                 params += '&date=' + date;
@@ -201,22 +201,22 @@
                     <thead>
                         <tr>
                             <th hidden>id</th>
-                            <th>学生姓名</th>
+                            <th>老师姓名</th>
                             <th>总课时</th>
                             <th>总课时费</th>
                             <th>查看详情</th>
                         </tr>
                     </thead>
                     <tbody >
-                        {% for student_price in student_price_list %}
+                        {% for teacher_price in teacher_price_list %}
                         <tr class="info">
-                            <td class="id" value="{{ student_price.id }}" hidden>{{ student_price.id }}</td>
-                            <td class="name" value="{{ student_price.name }}">{{ student_price.name }}</td>
-                            <td class="hour" value="{{ student_price.hour }}">{{ student_price.hour }}</td>
-                            <td class="price" value="{{ student_price.price }}">{{ student_price.price }}</td>
+                            <td class="id" value="{{ teacher_price.id }}" hidden>{{ teacher_price.id }}</td>
+                            <td class="name" value="{{ teacher_price.name }}">{{ teacher_price.name }}</td>
+                            <td class="hour" value="{{ teacher_price.hour }}">{{ teacher_price.hour }}</td>
+                            <td class="price" value="{{ teacher_price.price }}">{{ teacher_price.price }}</td>
                             <td>
                                 <!--传入当前用户id-->
-                                <button type="button" class="btn btn-info btn-sm" onclick="detail({{ student_price.id }})">查看详情</button>
+                                <button type="button" class="btn btn-info btn-sm" onclick="detail({{ teacher_price.id }})">查看详情</button>
                             </td>
                         </tr>
                         {% endfor %}

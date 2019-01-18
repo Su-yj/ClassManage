@@ -38,7 +38,7 @@ class LessonInfo(models.Model):
 class LessonOfStudent(models.Model):
     lesson = models.ForeignKey(verbose_name='课程信息', to=LessonInfo, on_delete=models.CASCADE)
     student = models.ForeignKey(verbose_name='学生信息', to='student.StudentInfo', on_delete=models.CASCADE)
-    price = models.DecimalField(verbose_name='学生课时费', max_digits=18, decimal_places=2)
+    price = models.IntegerField(verbose_name='学生课时费')
 
     def __str__(self):
         return self.lesson.name
@@ -51,7 +51,7 @@ class LessonOfStudent(models.Model):
 class LessonOfTeacher(models.Model):
     lesson = models.ForeignKey(verbose_name='课程信息', to=LessonInfo, on_delete=models.CASCADE)
     teacher = models.ForeignKey(verbose_name='老师信息', to='teacher.TeacherInfo', on_delete=models.CASCADE)
-    price = models.DecimalField(verbose_name='老师课时费', max_digits=18, decimal_places=2)
+    price = models.IntegerField(verbose_name='老师课时费')
 
     def __str__(self):
         return '%s %s' % (self.teacher, self.lesson)
@@ -65,27 +65,34 @@ class ScheduleLessonInfo(models.Model):
     lesson_of_teacher = models.ForeignKey(verbose_name='老师课程', to=LessonOfTeacher, on_delete=models.CASCADE)
     start = models.DateTimeField(verbose_name='开始时间')
     end = models.DateTimeField(verbose_name='结束时间')
+    teacher_sliding_price = models.IntegerField(verbose_name='老师变动价格', default=0)
+
+    def get_hour(self):
+        """计算课时"""
+        hour = self.end - self.start
+        hour = hour.seconds / 3600
+        return hour
 
     def get_lesson(self):
+        """获取课程的信息"""
         return self.lesson_of_teacher.lesson
 
-    def get_student(self):
-        lesson = self.lesson_of_teacher.lesson
-        lesson_of_student = LessonOfStudent.objects.filter(lesson=lesson)
-        student_list = []
-        for los in lesson_of_student:
-            student_list.append(los.student)
-        return student_list
+    def get_teacher(self):
+        """获取老师"""
+        return self.lesson_of_teacher.teacher
 
     def get_teacher_price(self):
-        lesson = self.get_lesson()
-        teacher = self.lesson_of_teacher.teacher
-        lesson_of_teacher = LessonOfTeacher.objects.filter(teacher=teacher, lesson=lesson)
-        return lesson_of_teacher.price
+        """获取老师价格"""
+        return self.lesson_of_teacher.price
 
-    def get_student_price_dict(self):
+    def get_student_list(self):
+        """获取学生列表"""
+        student_list = []
         lesson = self.get_lesson()
-        lesson_of_student = LessonOfStudent.objects.filter(lesson=lesson)
+        lesson_of_student_list = LessonOfStudent.objects.filter(lesson=lesson)
+        for lesson_of_student in lesson_of_student_list:
+            student_list.append(lesson_of_student.student)
+        return student_list
 
     class Meta:
         verbose_name = '排课表'

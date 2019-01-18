@@ -620,11 +620,11 @@ class ScheduleInfoView(View):
 
         schedule = ScheduleLessonInfo(lesson_of_teacher=lesson_of_teacher, start=start_time, end=end_time)
         schedule.save()
+
         # 添加价格
-        lesson = lesson_of_teacher.lesson
-        students = StudentInfo.objects.filter(lesson=lesson)
-        for student in students:
-            PriceInfo(student=student, teacher=lesson_of_teacher.teacher, schedule=schedule).save()
+        student_list = schedule.get_student_list()
+        for student in student_list:
+            PriceInfo(schedule=schedule, student=student).save()
         return JsonResponse(errmsg.SUCCESS)
 
     def edit(self, data):
@@ -658,10 +658,9 @@ class ScheduleInfoView(View):
         price_info_list = PriceInfo.objects.filter(schedule=schedule)
         for price_info in price_info_list:
             price_info.delete()
-        lesson = lesson_of_teacher.lesson
-        students = StudentInfo.objects.filter(lesson=lesson)
-        for student in students:
-            PriceInfo(student=student, teacher=lesson_of_teacher.teacher, schedule=schedule).save()
+        student_list = schedule.get_student_list()
+        for student in student_list:
+            PriceInfo(schedule=schedule, student=student).save()
         return JsonResponse(errmsg.SUCCESS)
 
     def delete(self, data):

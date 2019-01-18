@@ -44,7 +44,7 @@
     </script>
     <script>
         //定义一个变量用于存储添加和修改时不同的URL
-        var myUrl = '/price/student/';
+        var myUrl = '/price/teacher/';
 
         /* 获取url参数 */
         function getUrlParam(name) {
@@ -68,6 +68,8 @@
         /* 加减一个月 */
         function month(num) {
             var strDate = getUrlParam('date');
+            var student = getUrlParam('student');
+            var teacher = getUrlParam('teacher');
             if(strDate==null){
                 date = new Date();
             }
@@ -76,6 +78,12 @@
             }
             date = getFormatDate(date, num);
             var params = '?date=' + date;
+            if(student!=null){
+                params += '&student=' + student;
+            }
+            if(teacher!=null){
+                params += '&teacher=' + teacher;
+            }
             url = location.pathname + params;
             window.location.href = url;
         }
@@ -83,7 +91,16 @@
         /* 筛选器 */
         function filter(){
             var select_month = $('#select_month').val();
+            var student = getUrlParam('student');
+            var teacher = getUrlParam('teacher');
+
             var params = "?date=" + select_month;
+            if(student!=null){
+                params += '&student=' + student;
+            }
+            if(teacher!=null){
+                params += '&teacher=' + teacher;
+            }
             url = location.pathname + params;
             window.location.href = url;
         }
@@ -99,29 +116,32 @@
             })
         }
 
-        /* 价格统计 */
+        // 统计价格
         function count(){
             var hours = 0;
+            // var price_hours = 0;
+            var sliding_prices = 0;
             var prices = 0;
-            $('.info').each(function(index, item){
+            $('.info').each(function(){
                 hour = $(this).find('.hour').attr('value');
+                price_hour = $(this).find('.price_hour').attr('value');
+                sliding_price = $(this).find('#sliding_price').val();
                 price = $(this).find('.price').attr('value');
                 hours += Number(hour);
+                // price_hours += Number(price_hour);
+                sliding_prices += Number(sliding_price);
                 prices += Number(price);
             })
             $('#count').find('.hour').html(hours).attr('value', hours);
+            // $('#count').find('.price_hour').html(price_hours).attr('value', price_hours);
+            $('#count').find('.sliding_price').html(sliding_prices).attr('value', sliding_prices);
             $('#count').find('.price').html(prices).attr('value', prices);
         }
 
-        /* 点击详细 */
-        function detail(id){
-            var params = '?student=' + id;
-            var date = getUrlParam('date');
-            if(date!=null){
-                params += '&date=' + date;
-            }
-            url = location.pathname + params;
-            window.location.href = url;
+        // 修改
+        function modify(self, id){
+            var type = $('#count').attr('class');
+            var sliding_price = $(self).closest('tr').find('#sliding_price').val();
         }
 
         $(function(){
@@ -182,8 +202,8 @@
                     <button type="button" class="btn btn-info" onclick="month(1)">下一个月</button>
                 </div>
                 <div class="col-xs-12 col-sm-4 col-md-4">
-                    <p class="text-center">
-                        {{ date }}
+                    <p class="text-center" id="{{ id }}">
+                        {{ date }}&nbsp;&nbsp;{{ name }}
                     </p>
                 </div>
                 <div class="col-xs-12 col-sm-4 col-md-4">
@@ -201,33 +221,48 @@
                     <thead>
                         <tr>
                             <th hidden>id</th>
-                            <th>学生姓名</th>
-                            <th>总课时</th>
+                            <th>姓名</th>
+                            <th>课程名称</th>
+                            <th>上课时间</th>
+                            <th>上课时长</th>
+                            <th>课时费</th>
+                            <th>变动价格</th>
                             <th>总课时费</th>
-                            <th>查看详情</th>
+                            <th>修改</th>
                         </tr>
                     </thead>
                     <tbody >
-                        {% for student_price in student_price_list %}
+                        {% for detail in detail_list %}
                         <tr class="info">
-                            <td class="id" value="{{ student_price.id }}" hidden>{{ student_price.id }}</td>
-                            <td class="name" value="{{ student_price.name }}">{{ student_price.name }}</td>
-                            <td class="hour" value="{{ student_price.hour }}">{{ student_price.hour }}</td>
-                            <td class="price" value="{{ student_price.price }}">{{ student_price.price }}</td>
+                            <td class="id" value="{{ detail.id }}" hidden>{{ detail.id }}</td>
+                            <td class="name" value="{{ detail.name }}">{{ detail.name }}</td>
+                            <td class="lesson" value="{{ detail.lesson }}">{{ detail.lesson }}</td>
+                            <td class="time" value="">
+                                <div class="start" value="{{ detail.start }}">开始时间&nbsp;&nbsp;&nbsp;&nbsp;{{ detail.start }}</div>
+                                <div class="end" value="{{ detail.end }}">结束时间&nbsp;&nbsp;&nbsp;&nbsp;{{ detail.end }}</div>
+                            </td>
+                            <td class="hour" value="{{ detail.hour }}">{{ detail.hour }}</td>
+                            <td class="price_hour" value="{{ detail.price_hour }}">{{ detail.price_hour }}</td>
+                            <td class="sliding_price">
+                                <input style="text-align: center" type="text" class="form-control" id="sliding_price" name="sliding_price" value="{{ detail.sliding_price }}">
+                            </td>
+                            <td class="price" value="{{ detail.price }}">{{ detail.price }}</td>
                             <td>
                                 <!--传入当前用户id-->
-                                <button type="button" class="btn btn-info btn-sm" onclick="detail({{ student_price.id }})">查看详情</button>
+                                <button type="button" class="btn btn-info btn-sm" onclick="modify(this, {{ detail.id }})">修改</button>
                             </td>
                         </tr>
                         {% endfor %}
-                        <tr class="" id="count">
+                        <tr class="{{ type }}" id="count">
                             <td class="id" value="all" hidden>all</td>
                             <td class="name" value="统计">统计</td>
+                            <td class="" value="">/</td>
+                            <td class="time" value="">/</td>
                             <td class="hour" value=""></td>
+                            <td class="price_hour" value="">/</td>
+                            <td class="sliding_price"></td>
                             <td class="price" value=""></td>
-                            <td>
-                                <button type="button" class="btn btn-info btn-sm" onclick="detail('all')">查看详情</button>
-                            </td>
+                            <td>/</td>
                         </tr>
                     </tbody>
                 </table>
