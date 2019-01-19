@@ -1,0 +1,92 @@
+/*表格样式重写*/
+/*.table-responsive .table thead td{
+	font-weight: bold;
+}*/
+.table{
+    background-color: #fff;
+}
+
+.jumbotron{
+    background-color: #fff;
+}
+
+.table-bordered thead{
+    border: 2px solid #000;
+}
+
+.table-bordered tbody{
+    border: 2px solid #000;
+}
+
+.table-responsive .table-bordered tbody tr td, .table-responsive .table-bordered thead tr th, .table-responsive .table-bordered tbody tr th{
+    border: 1px solid #000;
+}
+
+.table tbody tr.info td{
+    background-color: #efefef;
+}
+
+.table th, .table td { 
+	text-align: center;
+	/* vertical-align: middle!important; */
+}
+
+.table-responsive .table{
+	padding: 2px;
+	color: #000;
+}
+
+/*课程信息框*/
+.lesson{
+	margin-bottom: 8px;
+	/*text-align: center;*/
+	background-color: #d9edf7;
+	/*border-radius: 5%;*/
+	padding: 3px 0;
+	/*border: 1px;*/
+	/*border-bottom-style: solid;*/
+	cursor: pointer;
+}
+
+/*上课时间*/
+.lesson .start_time, .lesson .end_time{
+	color: #323232;
+	font-weight: bold;
+}
+
+/*课程信息*/
+.lesson .lesson_info{
+	font-weight: bold;
+	color: #d37c00;
+}
+
+.mark_location{
+	position: relative;
+}
+
+/*必填项的**/
+@media (min-width: 768px)
+{
+	.star{
+		color: red;
+		font-weight: bold;
+		position: absolute;
+		right: 5px;
+		top: 10px;
+	}
+}
+
+@media (max-width: 767px)
+{
+	.star{
+		color: red;
+		font-weight: bold;
+		position: absolute;
+		right: 5px;
+		top: 3px;
+	}
+}
+
+.row{
+	margin-bottom: 20px;
+}
