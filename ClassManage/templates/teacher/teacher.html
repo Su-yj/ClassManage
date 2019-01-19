@@ -1,212 +1,201 @@
-{% extends "base.html" %}
+{% extends "base_form.html" %}
+
+
 {% block script %}
-    //定义一个变量用于存储添加和修改时不同的URL
-    var myUrl = '/teacher/info/';
+//定义一个变量用于存储添加和修改时不同的URL
+var myUrl = '/teacher/info/';
 
-    // 点击update,并传入id
-    function update(id) {
-        initForm();
-        $('#account').parent().parent().show();
+// 点击update,并传入id
+function update(id) {
+    initForm();
+    $('#account').parent().parent().show();
 
-        if(!id){
-            alert('id错误');
-            return false;
-        }
-
-        $.ajax({
-            url: myUrl,
-            data: {'id': id},
-            type: 'get',
-            dataType: 'json',
-            //解决编码问题
-            // scriptCharset: 'utf-8',
-            // contentType: "application/json; charset=utf-8",
-            beforeSend: function () {
-                return true;
-            },
-            success: function (data) {
-                if(data.code==0) {
-                    data = data.data;
-                    console.log(data);
-                    //赋值
-                    $('#id').val(data.id);
-                    $('#name').val(data.name);
-                    if(data.gender==true){
-                        var gender = 1;
-                    }
-                    else{
-                        var gender = 0;
-                    }
-                    $('#gender').val(gender);
-                    $('#account').val(data.account);
-                }
-                else{
-                    alert(data.message);
-                }
-            }
-        })
+    if(!id){
+        alert('id错误');
+        return false;
     }
 
-    //表单字段验证
-    //如果按照一般验证的写法，只能调用整个表单的validate函数，而不能调用自定义的user_name验证，所以把两个函数封装成为一个，在点击按钮时调用
-    function vali() {
-        //form-data表单验证。
-        $("#form-data").validate({
-            onfocusout:function(element) { $(element).valid(); },
-            onblur: function(element) { $(element).valid(); },    //鼠标移开验证。这里写onblue:true没有效果
-            onsubmit:true,      //提交时验证（有效）
-            onkeyup:false,
-
-            rules:{
-                name:{
-                    required:true,
-                    rangelength:[1,8],
-                },
-                gender:{
-                    required:true,
-                },
-            },
-            messages:{
-                name:{
-                    required:"请填写用户名",
-                    rangelength:"用户名长度不符合规范"
-                },
-                gender:{
-                    required:"请选择性别",
-                },
-            },
-            submitHandler:function (form) {
-                checkForm();
+    $.ajax({
+        url: myUrl,
+        data: {'id': id},
+        type: 'get',
+        dataType: 'json',
+        //解决编码问题
+        // scriptCharset: 'utf-8',
+        // contentType: "application/json; charset=utf-8",
+        beforeSend: function () {
+            return true;
+        },
+        success: function (data) {
+            if(data.code==0) {
+                data = data.data;
+                console.log(data);
+                //赋值
+                $('#id').val(data.id);
+                $('#name').val(data.name);
+                if(data.gender==true){
+                    var gender = 1;
+                }
+                else{
+                    var gender = 0;
+                }
+                $('#gender').val(gender);
+                $('#account').val(data.account);
             }
-        });
+            else{
+                alert(data.message);
+            }
+        }
+    })
+}
 
-        if($('#account').parent().parent().css('display')=='block') {
-            $("#account").rules('add', {
-                required: true,
-                rangelength: [8, 8],
-                remote: {
-                    type: 'POST',
-                    url: '/teacher/checkAccount/',
-                    dataType: 'json',
-                    contentType: "application/json; charset=utf-8",
-                    data: JSON.stringify({
-                        id: $('#id').val(),
-                        account: $('#account').val()
-                    }),
-                    dataFilter: function(data) {
-                        // 解析json
-                        var data = eval("("+data+")");
-                        if (data.code == 0) {
-                            if (data.repeat == false) {
-                                return true;
-                            }
-                            else {
-                                return false;
-                            }
+//表单字段验证
+//如果按照一般验证的写法，只能调用整个表单的validate函数，而不能调用自定义的user_name验证，所以把两个函数封装成为一个，在点击按钮时调用
+function vali() {
+    //form-data表单验证。
+    $("#form-data").validate({
+        onfocusout:function(element) { $(element).valid(); },
+        onblur: function(element) { $(element).valid(); },    //鼠标移开验证。这里写onblue:true没有效果
+        onsubmit:true,      //提交时验证（有效）
+        onkeyup:false,
+
+        rules:{
+            name:{
+                required:true,
+                rangelength:[1,8],
+            },
+            gender:{
+                required:true,
+            },
+        },
+        messages:{
+            name:{
+                required:"请填写用户名",
+                rangelength:"用户名长度不符合规范"
+            },
+            gender:{
+                required:"请选择性别",
+            },
+        },
+        submitHandler:function (form) {
+            checkForm();
+        }
+    });
+
+    if($('#account').parent().parent().css('display')=='block') {
+        $("#account").rules('add', {
+            required: true,
+            rangelength: [8, 8],
+            remote: {
+                type: 'POST',
+                url: '/teacher/checkAccount/',
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({
+                    id: $('#id').val(),
+                    account: $('#account').val()
+                }),
+                dataFilter: function(data) {
+                    // 解析json
+                    var data = eval("("+data+")");
+                    if (data.code == 0) {
+                        if (data.repeat == false) {
+                            return true;
                         }
                         else {
-                            alert(data.message);
                             return false;
                         }
                     }
-                },
-                messages: {
-                    required: '请输入账号',
-                    rangelength: '账号必须为8位',
-                    remote: '账号已存在',
+                    else {
+                        alert(data.message);
+                        return false;
+                    }
                 }
-            })
-        }
+            },
+            messages: {
+                required: '请输入账号',
+                rangelength: '账号必须为8位',
+                remote: '账号已存在',
+            }
+        })
     }
+}
 
-    // 初始化表单
-    function initForm() {
-        $('#id').val('');
-        $('#name').val('');
-        $('#tip').html('');
-        $('#gender option:first').prop('selected', true);
-        $('#account').val('');
-    }
+// 初始化表单
+function initForm() {
+    $('#id').val('');
+    $('#name').val('');
+    $('#tip').html('');
+    $('#gender option:first').prop('selected', true);
+    $('#account').val('');
+}
 
-    /*
-    点击添加用户时需要做的操作：
-        1.修改提交表单的URL
-        2.将user_name的readonly属性移除
-        3.清空表单数据
-        */
-    function setUrl() {
-        initForm();
-        $('#account').parent().parent().hide();
-    }
+/*
+点击添加用户时需要做的操作：
+    1.修改提交表单的URL
+    2.将user_name的readonly属性移除
+    3.清空表单数据
+    */
+function setUrl() {
+    initForm();
+    $('#account').parent().parent().hide();
+}
 {% endblock script %}
 
+
 {% block checkForm %}
-    var obj = {};
+var obj = {};
 
-    obj['type'] = 'add';
-    obj['name'] = $('#name').val();
-    obj['gender'] = parseInt($('#gender').val());
+obj['type'] = 'add';
+obj['name'] = $('#name').val();
+obj['gender'] = parseInt($('#gender').val());
 
-    if ($('#id').val().length!=0) {
-        obj['id'] = parseInt($('#id').val());
-        obj['type'] = 'edit';
-        obj['account'] = $('#account').val();
-    }
+if ($('#id').val().length!=0) {
+    obj['id'] = parseInt($('#id').val());
+    obj['type'] = 'edit';
+    obj['account'] = $('#account').val();
+}
 {% endblock checkForm %}
 
-{% block navbar %}
-    <li><a href="/lesson/schedule/">课表</a></li>
-    <li><a href="/lesson/student/">学生课程管理</a></li>
-    <li><a href="/lesson/teacher/">老师课程管理</a></li>
-    <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-            其他 <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-            <li><a href="/student/">学生管理</a></li>
-            <li class="active"><a href="/teacher/">老师管理</a></li>
-            <li><a href="/lesson/">课程种类</a></li>
-        </ul>
-    </li>
-{% endblock navbar %}
 
 {% block modal_form %}
-    <form action="" class="form-horizontal">
-        <!--user_id为隐藏的input，便于update时的传值-->
-        <input type="text" id="id" name="id" hidden>
-        <div class="form-group">
-            <label for="name" class="col-sm-3 control-label mark_location">
-                老师姓名
-                <span class="star">*</span>
-            </label>
-            <div class="col-sm-9">
-                <input type="text" class="form-control" id="name" name="name" placeholder="请输入姓名">
-            </div>
+<form action="" class="form-horizontal">
+    <!--user_id为隐藏的input，便于update时的传值-->
+    <input type="text" id="id" name="id" hidden>
+    <div class="form-group">
+        <label for="name" class="col-sm-3 control-label mark_location">
+            老师姓名
+            <span class="star">*</span>
+        </label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" id="name" name="name" placeholder="请输入姓名">
         </div>
-        <div class="form-group">
-            <label for="gender" class="col-sm-3 control-label mark_location">
-                性别
-                <span class="star">*</span>
-            </label>
-            <div class="col-sm-9">
-                <select class="form-control" id="gender" name="gender">
-                    <option value="">请选择性别</option>
-                    <option value="1">男</option>
-                    <option value="0">女</option>
-                </select>
-            </div>
+    </div>
+    <div class="form-group">
+        <label for="gender" class="col-sm-3 control-label mark_location">
+            性别
+            <span class="star">*</span>
+        </label>
+        <div class="col-sm-9">
+            <select class="form-control" id="gender" name="gender">
+                <option value="">请选择性别</option>
+                <option value="1">男</option>
+                <option value="0">女</option>
+            </select>
         </div>
-        <div class="form-group">
-            <label for="account" class="col-sm-3 control-label mark_location">
-                账号
-                <span class="star">*</span>
-            </label>
-            <div class="col-sm-9">
-                <input type="text" class="form-control" id="account" name="account" placeholder="请输入账号">
-            </div>
+    </div>
+    <div class="form-group">
+        <label for="account" class="col-sm-3 control-label mark_location">
+            账号
+            <span class="star">*</span>
+        </label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" id="account" name="account" placeholder="请输入账号">
         </div>
-    </form>
+    </div>
+</form>
 {% endblock modal_form %}
+
 
 {% block table %}
 <thead>

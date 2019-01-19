@@ -23,84 +23,23 @@
     <!-- <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/lib/jquery.js"></script>
     <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
     <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/localization/messages_zh.js"></script> -->
-
-    {% block head %}{% endblock head %}
+    <!-- 导航栏样式激活 -->
     <script>
-
-        {% block script %}{% endblock script %}
-
-        function checkForm() {
-
-            {% block checkForm %}{% endblock checkForm %}
-
-            console.log(JSON.stringify(obj));
-            $.ajax({
-                    url: myUrl,      //根据操作传入不同的URL
-                    type:"post",
-                    contentType: "application/json; charset=utf-8",
-                    data: JSON.stringify(obj),
-                    dataType:'json',
-                    timeout:50000,
-                    beforeSend:function () {
-                        $('#tip').html('<span style="color: cornflowerblue">正在处理...</span>');
-                        return true;
-                    },
-                    success:function (data) {
-                        if(data.code==0){
-                            $('#tip').html('<span style="color: green">操作成功！</span>');
-                            location.reload(true);
-                        }
-                        else{
-                            alert(data.message);
-                            $('#tip').html('<span style="color: red">操作失败，请重试</span>');
-                        }
-                    },
-                    error:function(XMLHttpRequest, textStatus, errorThrown) {
-                        // alert(XMLHttpRequest.status);//状态码
-                        // alert(XMLHttpRequest.readyState);//状态
-                        // alert(textStatus);//错误信息
-                        alert("出错了");
-
-                    },
-                    complete:function () {
-
-                    }
-            });
+        function active(){
+            var pathname = window.location.pathname;
+            $('#navbar').find('a').each(function(){
+                if($(this).attr('href')==pathname){
+                    $(this).parent().addClass('active');
+                    return;
+                }
+            })
         }
-
-        function delete_one(id) {
-            if(confirm('确定删除吗?')) {
-                var data = {}
-                data['type'] = 'delete';
-                data['id'] = id;
-                $.ajax({
-                    url: myUrl,
-                    data: JSON.stringify(data),
-                    type: 'post',
-                    dataType: 'json',
-                    //解决编码问题
-                    // scriptCharset: 'utf-8',
-                    // contentType: "application/json; charset=utf-8",
-                    beforeSend: function () {
-                        return true;
-                    },
-                    success: function (data) {
-                        if(data.code==0) {
-                            console.log(data);
-                            location.reload(true);
-                        }
-                        else{
-                            alert(data.message);
-                        }
-                    },
-                    error: function() {
-                        alert('出错了');
-                    }
-                })
-            }
-        }
-
+        $(function(){
+            active();
+        })
     </script>
+
+    {% block header %}{% endblock header %}
 
 </head>
 <body>
@@ -114,72 +53,36 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">课程管理系统</a>
+                <a class="navbar-brand" href="/lesson/schedule/">课程管理系统</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    {% block navbar %}{% endblock navbar %}
+                    <li><a href="/lesson/schedule/">课表</a></li>
+                    <li><a href="/lesson/student/">学生课程管理</a></li>
+                    <li><a href="/lesson/teacher/">老师课程管理</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            其他 <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/student/">学生管理</a></li>
+                            <li><a href="/teacher/">老师管理</a></li>
+                            <li><a href="/lesson/">课程种类</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li class="dropdown-header">价格统计</li>
+                            <li><a href="/price/student/">学生价格统计</a></li>
+                            <li><a href="/price/teacher/">老师价格统计</a></li>
+                        </ul>
+                    </li>
                 </ul>
+                <!-- <ul class="nav navbar-nav navbar-right">
+                    <li><a href="../navbar/">Default</a></li>
+                    <li class="active"><a href="./">Static top <span class="sr-only">(current)</span></a></li>
+                    <li><a href="../navbar-fixed-top/">Fixed top</a></li>
+                </ul> -->
             </div>
         </div>
     </nav>
-    <div class="jumbotron">
-        <div class="container">
-            <!-- Large modal -->
-            <!--<p class="text-left">-->
-                <!--<button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="prev()">上一周</button>-->
-            <!--</p>-->
-            <!--<p class="text-right"><button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">{{ add_button }}</button></p>-->
-            <div class="row">
-                <div class="col-xs-12 col-sm-6 col-md-8">
-                    {% block search %}{% endblock search %}
-                </div>
-                <div class="col-xs-6 col-md-4">
-                    <p class="text-right"><button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">{{ add_button }}</button></p>
-                </div>
-                <!--<div class="col-md-10">-->
-                    <!--<button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="prev()">上一周</button>-->
-                <!--</div>-->
-                <!--<div class="col-md-2">-->
-                    <!--<button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">{{ add_button }}</button>-->
-                    <!--<p class="text-right"><button type="button" class="btn btn-warning" data-toggle="modal" data-target="#updateModal" onclick="setUrl()">{{ add_button }}</button></p>-->
-                <!--</div>-->
-            </div>
-            <!--模态框-->
-            <form method="post" name="user" class="form-horizontal" role="form" id="form-data"  style="margin: 20px;" >
-                <div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                                    ×
-                                </button>
-                                <h4 class="modal-title" id="updateModalLabel">
-                                    {{ modal_title }}
-                                </h4>
-                            </div>
-                            <div class="modal-body">
-                                {% block modal_form %}{% endblock modal_form %}
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                                <!--type为submit时，会自动调用该表单的验证，但是不会调用自己定义的动态的user_name的验证，
-                                所以把按钮类型改为input，再手动调用封装好的验证函数-->
-                                {% block delete_btn %}{% endblock delete_btn %}
-                                <button type="input" class="btn btn-primary" onclick="vali();">提交</button>
-                                <span id="tip"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-            <!-- 表格 -->
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    {% block table %}{% endblock table %}
-                </table>
-            </div>
-        </div>
-    </div>
+    {% block body %}{% endblock body %}
 </body>
 </html>

@@ -35,6 +35,25 @@ class StudentPriceView(View):
                     return JsonResponse(errmsg.NO_SUCH_DATA)
             return self.student_price(request, student, date1, date2)
 
+    def post(self, request):
+        """修改变动价格"""
+        json_data = parse_json(request)
+        _id = json_data.get('id')
+        sliding_price = json_data.get('sliding_price')
+        if not all([_id, sliding_price]):
+            return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
+
+        price_info = PriceInfo.objects.filter(pk=_id).first()
+        if not price_info:
+            return JsonResponse(errmsg.NO_SUCH_DATA)
+
+        if not isinstance(sliding_price, int):
+            return JsonResponse(errmsg.PARAMETER_TYPE_ERROR)
+
+        price_info.student_sliding_price = sliding_price
+        price_info.save()
+        return JsonResponse(errmsg.SUCCESS)
+
     def student_all_price(self, request, date1, date2):
         """学生价格统计总表"""
         schedules = ScheduleLessonInfo.objects.filter(start__gte=date1, start__lt=date2)
@@ -134,6 +153,25 @@ class TeacherPriceView(View):
                 if not teacher:
                     return JsonResponse(errmsg.NO_SUCH_DATA)
             return self.teacher_price(request, teacher, date1, date2)
+
+    def post(self, request):
+        """修改老师变动价格"""
+        json_data = parse_json(request)
+        _id = json_data.get('id')
+        sliding_price = json_data.get('sliding_price')
+        if not all([_id, sliding_price]):
+            return JsonResponse(errmsg.INCOMPLETE_PARAMETERS)
+
+        schedule = ScheduleLessonInfo.objects.filter(pk=_id).first()
+        if not schedule:
+            return JsonResponse(errmsg.NO_SUCH_DATA)
+
+        if not isinstance(sliding_price, int):
+            return JsonResponse(errmsg.PARAMETER_TYPE_ERROR)
+
+        schedule.teacher_sliding_price = sliding_price
+        schedule.save()
+        return JsonResponse(errmsg.SUCCESS)
 
     def teacher_all_price(self, request, date1, date2):
         """老师价格统计总表"""

@@ -1,106 +1,107 @@
-{% extends "base.html" %}
+{% extends "base_form.html" %}
 
 {% block script %}
-    //定义一个变量用于存储添加和修改时不同的URL
-    var myUrl = '/lesson/student/info/';
+//定义一个变量用于存储添加和修改时不同的URL
+var myUrl = '/lesson/student/info/';
 
-    // 点击update,并传入id
-    function update(id) {
-        initForm();
-        if(!id){
-            alert('id错误');
-            return false;
+// 点击update,并传入id
+function update(id) {
+    initForm();
+    if(!id){
+        alert('id错误');
+        return false;
+    }
+
+    $.ajax({
+        url: myUrl,
+        data: {'id': id},
+        type: 'get',
+        dataType: 'json',
+        //解决编码问题
+        // scriptCharset: 'utf-8',
+        // contentType: "application/json; charset=utf-8",
+        beforeSend: function () {
+            return true;
+        },
+        success: function (data) {
+            if(data.code==0) {
+                data = data.data;
+                console.log(data);
+                //赋值
+                $('#id').val(data.id);
+                $('#student').val(data.student);
+                $('#subject').val(data.subject);
+                $('#price').val(data.price);
+            }
+            else{
+                alert(data.message);
+            }
         }
+    })
+}
 
-        $.ajax({
-            url: myUrl,
-            data: {'id': id},
-            type: 'get',
-            dataType: 'json',
-            //解决编码问题
-            // scriptCharset: 'utf-8',
-            // contentType: "application/json; charset=utf-8",
-            beforeSend: function () {
-                return true;
+//表单字段验证
+//如果按照一般验证的写法，只能调用整个表单的validate函数，而不能调用自定义的user_name验证，所以把两个函数封装成为一个，在点击按钮时调用
+function vali() {
+    //form-data表单验证。
+    $("#form-data").validate({
+        onfocusout:function(element) { $(element).valid(); },
+        onblur: function(element) { $(element).valid(); },    //鼠标移开验证。这里写onblue:true没有效果
+        onsubmit:true,      //提交时验证（有效）
+        onkeyup:false,
+
+        rules:{
+            student:{
+                required:true,
             },
-            success: function (data) {
-                if(data.code==0) {
-                    data = data.data;
-                    console.log(data);
-                    //赋值
-                    $('#id').val(data.id);
-                    $('#student').val(data.student);
-                    $('#subject').val(data.subject);
-                    $('#price').val(data.price);
-                }
-                else{
-                    alert(data.message);
-                }
+            subject:{
+                required:true,
+            },
+            price:{
+                required:true,
+                number:true,
+                range:[0,99999]
             }
-        })
-    }
-
-    //表单字段验证
-    //如果按照一般验证的写法，只能调用整个表单的validate函数，而不能调用自定义的user_name验证，所以把两个函数封装成为一个，在点击按钮时调用
-    function vali() {
-        //form-data表单验证。
-        $("#form-data").validate({
-            onfocusout:function(element) { $(element).valid(); },
-            onblur: function(element) { $(element).valid(); },    //鼠标移开验证。这里写onblue:true没有效果
-            onsubmit:true,      //提交时验证（有效）
-            onkeyup:false,
-
-            rules:{
-                student:{
-                    required:true,
-                },
-                subject:{
-                    required:true,
-                },
-                price:{
-                    required:true,
-                    number:true,
-                    range:[0,99999]
-                }
+        },
+        messages:{
+            student:{
+                required:"请选择学生",
             },
-            messages:{
-                student:{
-                    required:"请选择学生",
-                },
-                subject:{
-                    required:"请选择科目种类",
-                },
-                price:{
-                    required:"请输入价格",
-                    number:"请输入数字",
-                    range:"请在0-9999范围内输入"
-                },
+            subject:{
+                required:"请选择科目种类",
             },
-            submitHandler:function (form) {
-                checkForm();
-            }
-        });
-    }
+            price:{
+                required:"请输入价格",
+                number:"请输入数字",
+                range:"请在0-9999范围内输入"
+            },
+        },
+        submitHandler:function (form) {
+            checkForm();
+        }
+    });
+}
 
-    // 初始化表单
-    function initForm() {
-        $('#tip').html('');
-        $('#id').val('');
-        $('#student option:first').prop('selected', true);
-        $('#lesson option:first').prop('selected', true);
-        $('#price').val('');
-    }
+// 初始化表单
+function initForm() {
+    $('#tip').html('');
+    $('#id').val('');
+    $('#student option:first').prop('selected', true);
+    $('#lesson option:first').prop('selected', true);
+    $('#price').val('');
+}
 
-    /*
-    点击添加用户时需要做的操作：
-        1.修改提交表单的URL
-        2.将user_name的readonly属性移除
-        3.清空表单数据
-        */
-    function setUrl() {
-        initForm();
-    }
+/*
+点击添加用户时需要做的操作：
+    1.修改提交表单的URL
+    2.将user_name的readonly属性移除
+    3.清空表单数据
+    */
+function setUrl() {
+    initForm();
+}
 {% endblock script %}
+
 
 {% block checkForm %}
     var obj = {};
@@ -117,91 +118,77 @@
     }
 {% endblock checkForm %}
 
-{% block navbar %}
-    <li><a href="/lesson/schedule/">课表</a></li>
-    <li class="active"><a href="/lesson/student/">学生课程管理</a></li>
-    <li><a href="/lesson/teacher/">老师课程管理</a></li>
-    <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-            其他 <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-            <li><a href="/student/">学生管理</a></li>
-            <li><a href="/teacher/">老师管理</a></li>
-            <li><a href="/lesson/">课程种类</a></li>
-        </ul>
-    </li>
-{% endblock navbar %}
 
 {% block modal_form %}
-    <form action="" class="form-horizontal">
-        <!--user_id为隐藏的input，便于update时的传值-->
-        <input type="text" id="id" name="id" hidden>
-        <div class="form-group">
-            <label for="student" class="col-sm-3 control-label mark_location">
-                学生
-                <span class="star">*</span>
-            </label>
-            <div class="col-sm-9">
-                <select class="form-control" id="student" name="student">
-                    <option value="">请选择学生</option>
-                    {% for student in student_list %}
-                        <option value="{{ student.id }}">{{ student.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+<form action="" class="form-horizontal">
+    <!--user_id为隐藏的input，便于update时的传值-->
+    <input type="text" id="id" name="id" hidden>
+    <div class="form-group">
+        <label for="student" class="col-sm-3 control-label mark_location">
+            学生
+            <span class="star">*</span>
+        </label>
+        <div class="col-sm-9">
+            <select class="form-control" id="student" name="student">
+                <option value="">请选择学生</option>
+                {% for student in student_list %}
+                    <option value="{{ student.id }}">{{ student.name }}</option>
+                {% endfor %}
+            </select>
         </div>
-        <div class="form-group">
-            <label for="subject" class="col-sm-3 control-label mark_location">
-                科目种类
-                <span class="star">*</span>
-            </label>
-            <div class="col-sm-9">
-                <select class="form-control" id="subject" name="subject">
-                    <option value="">请选择科目种类</option>
-                    {% for subject in subject_list %}
-                        <option value="{{ subject.id }}">{{ subject.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+    </div>
+    <div class="form-group">
+        <label for="subject" class="col-sm-3 control-label mark_location">
+            科目种类
+            <span class="star">*</span>
+        </label>
+        <div class="col-sm-9">
+            <select class="form-control" id="subject" name="subject">
+                <option value="">请选择科目种类</option>
+                {% for subject in subject_list %}
+                    <option value="{{ subject.id }}">{{ subject.name }}</option>
+                {% endfor %}
+            </select>
         </div>
-        <div class="form-group" id="hide_account">
-            <label for="price" class="col-sm-3 control-label mark_location">
-                课时费
-                <span class="star">*</span>
-            </label>
-            <div class="col-sm-9">
-                <input type="text" class="form-control" id="price" name="price" placeholder="请输入价格">
-            </div>
+    </div>
+    <div class="form-group" id="hide_account">
+        <label for="price" class="col-sm-3 control-label mark_location">
+            课时费
+            <span class="star">*</span>
+        </label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" id="price" name="price" placeholder="请输入价格">
         </div>
-    </form>
+    </div>
+</form>
 {% endblock modal_form %}
 
+
 {% block table %}
-    <thead>
-        <tr>
-            <th hidden>id</th>
-            <th>学生</th>
-            <th>科目种类</th>
-            <th>课时费</th>
-            <th>修改</th>
-        </tr>
-    </thead>
-    <tbody >
-        {% for student_of_lesson in student_of_lesson_list %}
-        <tr class="info">
-            <td class="id" value="{{ student_of_lesson.id }}" hidden>{{ student_of_lesson.id }}</td>
-            <td class="student" value="{{ student_of_lesson.student.id }}">{{ student_of_lesson.student.name }}</td>
-            <td class="subject" value="{{ student_of_lesson.lesson.subject.id }}">{{ student_of_lesson.lesson.subject.name }}</td>
-            <td class="price" value="{{ student_of_lesson.price }}">{{ student_of_lesson.price }}</td>
-            <td>
-                <!--传入当前用户id-->
-                <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#updateModal" onclick="update({{ student_of_lesson.id }})">编辑</button>
-                <button type="button" class="btn btn-danger btn-sm"  onclick="delete_one({{ student_of_lesson.id }})">删除</button>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
+<thead>
+    <tr>
+        <th hidden>id</th>
+        <th>学生</th>
+        <th>科目种类</th>
+        <th>课时费</th>
+        <th>修改</th>
+    </tr>
+</thead>
+<tbody >
+    {% for student_of_lesson in student_of_lesson_list %}
+    <tr class="info">
+        <td class="id" value="{{ student_of_lesson.id }}" hidden>{{ student_of_lesson.id }}</td>
+        <td class="student" value="{{ student_of_lesson.student.id }}">{{ student_of_lesson.student.name }}</td>
+        <td class="subject" value="{{ student_of_lesson.lesson.subject.id }}">{{ student_of_lesson.lesson.subject.name }}</td>
+        <td class="price" value="{{ student_of_lesson.price }}">{{ student_of_lesson.price }}</td>
+        <td>
+            <!--传入当前用户id-->
+            <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#updateModal" onclick="update({{ student_of_lesson.id }})">编辑</button>
+            <button type="button" class="btn btn-danger btn-sm"  onclick="delete_one({{ student_of_lesson.id }})">删除</button>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
 {% endblock table %}
 
 

@@ -1,238 +1,156 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{ title }}</title>
-    <!-- <script type="text/javascript" src="js/set_root.js"></script> -->
-    <!-- <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script> -->
-    <!-- jquery -->
-    <script src="/static/js/jquery.min.js"></script>
-    <!-- bootstrap js -->
-    <script src="/static/js/bootstrap.min.js"></script>
-    <!-- bootstrap css -->
-    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
-    <!-- <link rel="stylesheet" href="/static/css/reset.css"> -->
-    <link rel="stylesheet" href="/static/css/main.css">
-    <!--validate验证表单插件-->
-    <script src="/static/js/jquery-1.11.1.js"></script>
-    <script src="/static/js/jquery.validate.min.js"></script>
-    <script src="/static/js/messages_zh.js"></script>
-    <link rel="stylesheet" href="/static/css/validation.css">
-    <!-- <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/lib/jquery.js"></script>
-    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
-    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/localization/messages_zh.js"></script> -->
+{% extends "base_form.html" %}
 
-    <!-- datetimepicker时间插件 -->
-    <script src="/static/js/bootstrap-datetimepicker.min.js"></script>
-    <script src="/static/js/bootstrap-datetimepicker.zh-CN.js"></script>
-    <link rel="stylesheet" href="/static/css/bootstrap-datetimepicker.min.css">
-    <!-- 时间选择器 -->
-    <script>
-        $(function(){
-            $("#select_month").datetimepicker({
-                format: 'yyyy-mm',
-                weekStart: 1,
-                autoclose: true,
-                startView: 3,
-                minView: 3,
-                forceParse: false,
-                language: 'zh-CN'
-            });
+
+{% block header %}
+<!-- datetimepicker时间插件 -->
+<script src="/static/js/bootstrap-datetimepicker.min.js"></script>
+<script src="/static/js/bootstrap-datetimepicker.zh-CN.js"></script>
+<link rel="stylesheet" href="/static/css/bootstrap-datetimepicker.min.css">
+<!-- 时间选择器 -->
+<script>
+    $(function(){
+        $("#select_month").datetimepicker({
+            format: 'yyyy-mm',
+            weekStart: 1,
+            autoclose: true,
+            startView: 3,
+            minView: 3,
+            forceParse: false,
+            language: 'zh-CN'
         });
-    </script>
-    <script>
-        //定义一个变量用于存储添加和修改时不同的URL
-        var myUrl = '/price/student/';
+    });
+</script>
+<script>
+    //定义一个变量用于存储添加和修改时不同的URL
+    var myUrl = '/price/student/';
 
-        /* 获取url参数 */
-        function getUrlParam(name) {
-            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
-            var r = window.location.search.substr(1).match(reg);  //匹配目标参数
-            if (r != null) return unescape(r[2]); return null; //返回参数值
+    /* 获取url参数 */
+    function getUrlParam(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+        var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+        if (r != null) return unescape(r[2]); return null; //返回参数值
+    }
+
+    /* 获取当前日期 */
+    function getFormatDate(date, n){
+        var date = date;
+        var year,month,day ;
+        date.setMonth(date.getMonth()+n);
+        year = date.getFullYear();
+        month = date.getMonth()+1;
+        day = date.getDate() ;
+        s = year + '-' + ( month < 10 ? ( '0' + month ) : month );
+        return s ;
+    }
+
+    /* 加减一个月 */
+    function month(num) {
+        var strDate = getUrlParam('date');
+        if(strDate==null){
+            date = new Date();
         }
-
-        /* 获取当前日期 */
-        function getFormatDate(date, n){
-            var date = date;
-            var year,month,day ;
-            date.setMonth(date.getMonth()+n);
-            year = date.getFullYear();
-            month = date.getMonth()+1;
-            day = date.getDate() ;
-            s = year + '-' + ( month < 10 ? ( '0' + month ) : month );
-            return s ;
+        else{
+            date = new Date(Date.parse(strDate));
         }
+        date = getFormatDate(date, num);
+        var params = '?date=' + date;
+        url = location.pathname + params;
+        window.location.href = url;
+    }
 
-        /* 加减一个月 */
-        function month(num) {
-            var strDate = getUrlParam('date');
-            if(strDate==null){
-                date = new Date();
-            }
-            else{
-                date = new Date(Date.parse(strDate));
-            }
-            date = getFormatDate(date, num);
-            var params = '?date=' + date;
-            url = location.pathname + params;
-            window.location.href = url;
-        }
+    /* 筛选器 */
+    function filter(){
+        var select_month = $('#select_month').val();
+        var params = "?date=" + select_month;
+        url = location.pathname + params;
+        window.location.href = url;
+    }
 
-        /* 筛选器 */
-        function filter(){
-            var select_month = $('#select_month').val();
-            var params = "?date=" + select_month;
-            url = location.pathname + params;
-            window.location.href = url;
-        }
-
-        /* 样式激活 */
-        function active(){
-            var pathname = window.location.pathname;
-            $('.nav').find('a').each(function(){
-                if($(this).attr('href')==pathname){
-                    $(this).parent().addClass('active');
-                    return;
-                }
-            })
-        }
-
-        /* 价格统计 */
-        function count(){
-            var hours = 0;
-            var prices = 0;
-            $('.info').each(function(index, item){
-                hour = $(this).find('.hour').attr('value');
-                price = $(this).find('.price').attr('value');
-                hours += Number(hour);
-                prices += Number(price);
-            })
-            $('#count').find('.hour').html(hours).attr('value', hours);
-            $('#count').find('.price').html(prices).attr('value', prices);
-        }
-
-        /* 点击详细 */
-        function detail(id){
-            var params = '?student=' + id;
-            var date = getUrlParam('date');
-            if(date!=null){
-                params += '&date=' + date;
-            }
-            url = location.pathname + params;
-            window.location.href = url;
-        }
-
-        $(function(){
-            active();
-            count();
+    /* 价格统计 */
+    function count(){
+        var hours = 0;
+        var prices = 0;
+        $('.info').each(function(index, item){
+            hour = $(this).find('.hour').attr('value');
+            price = $(this).find('.price').attr('value');
+            hours += Number(hour);
+            prices += Number(price);
         })
+        $('#count').find('.hour').html(hours).attr('value', hours);
+        $('#count').find('.price').html(prices).attr('value', prices);
+    }
 
-    </script>
+    /* 点击详细 */
+    function detail(id){
+        var params = '?student=' + id;
+        var date = getUrlParam('date');
+        if(date!=null){
+            params += '&date=' + date;
+        }
+        url = location.pathname + params;
+        window.location.href = url;
+    }
 
-</head>
-<body>
-    <!-- 导航栏 -->
-    <nav class="navbar navbar-default navbar-static-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">切换导航</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="#">课程管理系统</a>
-            </div>
-            <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a href="/lesson/schedule/">课表</a></li>
-                    <li><a href="/lesson/student/">学生课程管理</a></li>
-                    <li><a href="/lesson/teacher/">老师课程管理</a></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                            其他 <span class="caret"></span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a href="/student/">学生管理</a></li>
-                            <li><a href="/teacher/">老师管理</a></li>
-                            <li><a href="/lesson/">课程种类</a></li>
-                            <li role="separator" class="divider"></li>
-                            <li class="dropdown-header">价格统计</li>
-                            <li><a href="/price/student/">学生价格统计</a></li>
-                            <li><a href="/price/teacher/">老师价格统计</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <!-- <ul class="nav navbar-nav navbar-right">
-                    <li><a href="../navbar/">Default</a></li>
-                    <li class="active"><a href="./">Static top <span class="sr-only">(current)</span></a></li>
-                    <li><a href="../navbar-fixed-top/">Fixed top</a></li>
-                </ul> -->
-            </div>
-        </div>
-    </nav>
-    <div class="jumbotron">
-        <div class="container">
-            <!-- Large modal -->
-            <div class="row">
-                <div class="col-xs-12 col-sm-4 col-md-4">
-                    <button type="button" class="btn btn-info" onclick="month(-1)">上一个月</button>
-                    <button type="button" class="btn btn-info" onclick="month(1)">下一个月</button>
-                </div>
-                <div class="col-xs-12 col-sm-4 col-md-4">
-                    <p class="text-center">
-                        {{ date }}
-                    </p>
-                </div>
-                <div class="col-xs-12 col-sm-4 col-md-4">
-                    <div class="col-xs-9 col-sm-9 col-md-9">
-                        <input type="text" class="form-control" placeholder="选择月份" id="select_month" name="select_month" autocomplete='off'>
-                    </div>
-                    <div class="col-xs-3 col-sm-3 col-md-3">
-                        <button type="button" class="btn btn-default" onclick="filter()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-                    </div>
-                </div>
-            </div>
-            <!-- 表格 -->
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead>
-                        <tr>
-                            <th hidden>id</th>
-                            <th>学生姓名</th>
-                            <th>总课时</th>
-                            <th>总课时费</th>
-                            <th>查看详情</th>
-                        </tr>
-                    </thead>
-                    <tbody >
-                        {% for student_price in student_price_list %}
-                        <tr class="info">
-                            <td class="id" value="{{ student_price.id }}" hidden>{{ student_price.id }}</td>
-                            <td class="name" value="{{ student_price.name }}">{{ student_price.name }}</td>
-                            <td class="hour" value="{{ student_price.hour }}">{{ student_price.hour }}</td>
-                            <td class="price" value="{{ student_price.price }}">{{ student_price.price }}</td>
-                            <td>
-                                <!--传入当前用户id-->
-                                <button type="button" class="btn btn-info btn-sm" onclick="detail({{ student_price.id }})">查看详情</button>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                        <tr class="" id="count">
-                            <td class="id" value="all" hidden>all</td>
-                            <td class="name" value="统计">统计</td>
-                            <td class="hour" value=""></td>
-                            <td class="price" value=""></td>
-                            <td>
-                                <button type="button" class="btn btn-info btn-sm" onclick="detail('all')">查看详情</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    $(function(){
+        count();
+    })
+
+</script>
+{% endblock header %}
+
+
+{% block row %}
+<div class="col-xs-12 col-sm-4 col-md-4">
+    <button type="button" class="btn btn-info" onclick="month(-1)">上一个月</button>
+    <button type="button" class="btn btn-info" onclick="month(1)">下一个月</button>
+</div>
+<div class="col-xs-12 col-sm-4 col-md-4">
+    <p class="text-center">
+        {{ date }}
+    </p>
+</div>
+<div class="col-xs-12 col-sm-4 col-md-4">
+    <div class="col-xs-9 col-sm-9 col-md-9">
+        <input type="text" class="form-control" placeholder="选择月份" id="select_month" name="select_month" autocomplete='off'>
     </div>
-</body>
-</html>
+    <div class="col-xs-3 col-sm-3 col-md-3">
+        <button type="button" class="btn btn-default" onclick="filter()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+    </div>
+</div>
+{% endblock row %}
+
+
+{% block table %}
+<thead>
+    <tr>
+        <th hidden>id</th>
+        <th>学生姓名</th>
+        <th>总课时</th>
+        <th>总课时费</th>
+        <th>查看详情</th>
+    </tr>
+</thead>
+<tbody >
+    {% for student_price in student_price_list %}
+    <tr class="info">
+        <td class="id" value="{{ student_price.id }}" hidden>{{ student_price.id }}</td>
+        <td class="name" value="{{ student_price.name }}">{{ student_price.name }}</td>
+        <td class="hour" value="{{ student_price.hour }}">{{ student_price.hour }}</td>
+        <td class="price" value="{{ student_price.price }}">{{ student_price.price }}</td>
+        <td>
+            <!--传入当前用户id-->
+            <button type="button" class="btn btn-info btn-sm" onclick="detail({{ student_price.id }})">查看详情</button>
+        </td>
+    </tr>
+    {% endfor %}
+    <tr class="" id="count">
+        <td class="id" value="all" hidden>all</td>
+        <td class="name" value="统计">统计</td>
+        <td class="hour" value=""></td>
+        <td class="price" value=""></td>
+        <td>
+            <button type="button" class="btn btn-info btn-sm" onclick="detail('all')">查看详情</button>
+        </td>
+    </tr>
+</tbody>
+{% endblock table %}
